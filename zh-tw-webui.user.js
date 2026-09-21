@@ -2,7 +2,7 @@
 // @name         繁體中文介面（Claude + GitHub）
 // @name:zh-TW   繁體中文介面（Claude + GitHub）
 // @namespace    https://github.com/b010203044-code/zh-tw-webui
-// @version      3.4.0
+// @version      3.5.0
 // @description  把 claude.ai 與 github.com 的「介面文字」換成繁體中文（台灣用語）。只翻譯介面，絕不更動對話內容、程式碼、檔名、議題內文等使用者資料。
 // @author       Harry
 // @match        https://claude.ai/*
@@ -56,7 +56,7 @@
          因為使用者的檔名、資料夾名、討論串名或專案名很可能剛好就叫這些字。 */
       attrOnly: ['App', 'Other', 'Kind', 'Size', 'Goal', 'Grid', 'List', 'Extra', 'Input', 'Output', 'Read',
                  'Personal', 'Folder', 'Check', 'Environment', 'Developer', 'Organization', 'Models',
-                 'Tokens', 'Project', 'Select', 'Thread'],
+                 'Tokens', 'Project', 'Select', 'Thread', 'Mode', 'Move', 'Prompt', 'High', 'Low'],
 
       dict: {
     /* ---- 側邊欄與導覽 ---- */
@@ -620,7 +620,42 @@
     /* ---- GitHub App 授權頁（從 claude.ai 導過去，兩邊字典都要有） ---- */
     'Select at least one repository. Also includes public repositories (read-only).': '請至少選取一個儲存庫，也包含公開儲存庫（唯讀）。',
     'Read and write access to code, issues, pull requests, workflows': '對程式碼、議題、合併請求與 workflow 的讀寫權限',
-    'Read and write access to actions, checks, code, discussions, issues, pull requests, repository hooks, and workflows': '對 Actions、檢查、程式碼、討論、議題、合併請求、儲存庫 Webhook 與 workflow 的讀寫權限'
+    'Read and write access to actions, checks, code, discussions, issues, pull requests, repository hooks, and workflows': '對 Actions、檢查、程式碼、討論、議題、合併請求、儲存庫 Webhook 與 workflow 的讀寫權限',
+
+    /* ---- 側邊欄與導覽 ---- */
+    'Hide sidebar': '隱藏側邊欄',
+    'Resize sidebar': '調整側邊欄大小',
+    'Sidebar': '側邊欄',
+    'More navigation items': '更多導覽項目',
+    'Filter and group recents': '篩選並分組最近項目',
+    'Pinned': '已釘選',
+    'Scheduled': '已排程',
+
+    /* ---- 訊息與交談 ---- */
+    'Chat messages': '交談訊息',
+    'Show message actions': '顯示訊息操作',
+    'Unread response': '未讀回覆',
+    'New from a template': '從範本建立',
+    'Customize': '自訂',
+
+    /* ---- 模式與投入程度。High / Low / Mode / Prompt / Move 是泛用字，走 attrOnly ---- */
+    'High': '高',
+    'Low': '低',
+    'Mode': '模式',
+    'Move': '移動',
+    'Prompt': '提示詞',
+    'Fast mode off': '快速模式已關閉',
+    'Fast mode on': '快速模式已開啟',
+
+    /* ---- 用量 ---- */
+    'Approaching session usage limit': '接近工作階段用量上限',
+    'Resets at': '重設時間',
+
+    /* ---- 其他 ---- */
+    '(opens in new tab)': '（在新分頁開啟）',
+    'Get apps and extensions': '取得應用程式與擴充功能',
+    'Repository and pull request controls': '儲存庫與合併請求控制項',
+    'Arrow keys move the tile. Perpendicular arrows preview a split; press Enter to commit or Escape to cancel.': '方向鍵可移動磚塊。垂直方向的方向鍵會預覽分割；按 Enter 確認，按 Escape 取消。'
       },
 
       patterns: [
@@ -668,7 +703,20 @@
         [/^Daily at (.+)$/, (m) => '每天 ' + m[1]],
         [/^Sort by: (.+)$/, (m) => '排序：' + (translateString(m[1], true) || m[1])],
         [/^Good (morning|afternoon|evening), (.+)$/,
-          (m) => ({ morning: '早安', afternoon: '午安', evening: '晚安' })[m[1].toLowerCase()] + '，' + m[2]]
+          (m) => ({ morning: '早安', afternoon: '午安', evening: '晚安' })[m[1].toLowerCase()] + '，' + m[2]],
+        /* 後面接的是使用者的檔名或討論串名，照原樣帶入不翻 */
+        [/^Download (.+)$/, (m) => '下載 ' + m[1]],
+        [/^More options for (.+)$/, (m) => m[1] + ' 的更多選項', true],
+        [/^Effort: (.+)$/, (m) => '投入程度：' + (translateString(m[1], true) || m[1])],
+        [/^Model: (.+)$/, (m) => '模型：' + m[1]],
+        [/^Resize (\d+) and (\d+)$/, (m) => '調整 ' + m[1] + ' 與 ' + m[2] + ' 的大小'],
+        /* 側邊欄常駐的用量列。百分比、時數、剩餘時間全部照原樣帶入 */
+        [/^Usage: (\d+)% of (\d+)-hour limit, Resets in (.+), Compacts automatically$/,
+          (m) => '用量：' + m[2] + ' 小時上限的 ' + m[1] + '%，' +
+                 (translateString(m[3], true) || m[3]) + '後重設，自動壓縮'],
+        [/^Resets in (.+)$/, (m) => (translateString(m[1], true) || m[1]) + '後重設'],
+        [/^(\d+)\s+hrs?\s+(\d+)\s+min$/i, (m) => m[1] + ' 小時 ' + m[2] + ' 分'],
+        [/^(\d+)\s+min$/i, (m) => m[1] + ' 分']
       ]
     },
 
@@ -1386,7 +1434,7 @@
   }
 
   // 也掛到 window，方便直接在主控台叫：zhTwWebui.diagnose()
-  try { window.zhTwWebui = { diagnose: diagnose, version: '3.4.0', site: site.label }; } catch (e) { /* ignore */ }
+  try { window.zhTwWebui = { diagnose: diagnose, version: '3.5.0', site: site.label }; } catch (e) { /* ignore */ }
 
   function toast(text) {
     const el = document.createElement('div');
