@@ -66,7 +66,9 @@ Chrome 系列要多做一步：到 `chrome://extensions`，把右上角的**開�
 
 | 保留英文 | 翻成中文 |
 |---|---|
-| Fork、commit、Actions、Wiki、Gist、Raw、Blame、Clone、Squash、Rebase、Codespaces、Artifacts | 合併請求（Pull requests）、議題（Issues）、程式碼（Code）、洞察（Insights）、安全性（Security）、儲存庫（Repositories）、分支（Branches）、標籤（Tags） |
+| Fork、commit、Actions、Wiki、Gist、Raw、Blame、Clone、Squash、Rebase、Codespaces | 作品（Artifacts）、合併請求（Pull requests）、議題（Issues）、程式碼（Code）、洞察（Insights）、安全性（Security）、儲存庫（Repositories）、分支（Branches）、標籤（Tags） |
+
+> `Artifacts` 原本歸在保留英文那欄，v3.12.0 改譯為「作品」。理由是那一頁裝的是文件、投影片、Design 與 HTML 檔，都是做完可以單獨打開的東西，「作品」涵蓋得到；「文件」已經被 `Docs` 用掉，會撞名。GitHub 的 `Artifacts`（Actions 工作流程的產出檔）是另一回事，維持英文。
 
 這只是預設，每一條都是字典裡的一行，想改哪個就改哪個。例如你想讓 `Pull requests` 維持英文，把那一行的值改成 `'Pull requests'` 就好。
 

@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         繁體中文介面（Claude + GitHub） v3.11.1
-// @name:zh-TW   繁體中文介面（Claude + GitHub） v3.11.1
+// @name         繁體中文介面（Claude + GitHub） v3.12.0
+// @name:zh-TW   繁體中文介面（Claude + GitHub） v3.12.0
 // @namespace    https://github.com/b010203044-code/zh-tw-webui
-// @version      3.11.1
+// @version      3.12.0
 // @description  把 claude.ai 與 github.com 的「介面文字」換成繁體中文（台灣用語）。只翻譯介面，絕不更動對話內容、程式碼、檔名、議題內文等使用者資料。
 // @author       Harry
 // @match        https://claude.ai/*
@@ -19,7 +19,7 @@
 
   /* 版本號。改版時四個地方要一起改：@name、@name:zh-TW、@version、這裡。
      @name 帶版本號是為了在油猴控制台與動作選單上一眼看得出跑的是哪一版。 */
-  const VERSION = '3.11.1';
+  const VERSION = '3.12.0';
 
   /* ------------------------------------------------------------------ *
    * 1. 共用保護區：所有站台都不動這些地方的文字
@@ -70,7 +70,7 @@
          理由逐條記在 repo 的 未採用字串.md。 */
       never: ['Anthropic', 'Anthropic PBC', 'PBC', 'Claude', 'Claude Code', 'Claude Pro', 'Claude Max',
               'Opus', 'Sonnet', 'Haiku', 'Opus 5', 'Opus 4.8', 'Sonnet 5', 'Haiku 4.5',
-              'Pro', 'Max', 'Artifact', 'Artifacts', 'MCP', 'API',
+              'Pro', 'Max', 'MCP', 'API',
               'CDN', 'Chromium', 'GitHub', 'Tampermonkey', 'Ctrl', 'Shift', 'Alt', 'Enter', 'Esc',
               'Escape', 'Tab', 'Backspace', 'Cmd', 'Option', 'README', 'LICENSE'],
 
@@ -85,7 +85,8 @@
     'Starred': '已加星號',
     'Projects': '專案',
     'All projects': '所有專案',
-    'Artifacts': 'Artifacts',
+    'Artifact': '作品',
+    'Artifacts': '作品',
     'Library': '資料庫',
     'Connectors': '連接器',
     'Settings': '設定',
@@ -421,7 +422,7 @@
     'A button for each file that opens it — press Tab until focus enters the card, Escape to return.': '每個檔案都有一個可開啟它的按鈕 — 按 Tab 直到焦點進入卡片，按 Escape 返回。',
     'A card with a "Start with a prompt" link is available — press Tab until focus enters the card, Escape to return.': '有一張含「從提示詞開始」連結的卡片 — 按 Tab 直到焦點進入卡片，按 Escape 返回。',
     'A to Z': 'A 到 Z',
-    'Actions for Artifacts': 'Artifacts 的操作',
+    'Actions for Artifacts': '作品的操作',
     'Add a README': '新增 README',
     'Add a file': '新增檔案',
     'Add a folder': '新增資料夾',
@@ -436,7 +437,7 @@
     'Archive project': '封存專案',
     'Ask Claude a question or start a task…': '向 Claude 提問或開始一項任務…',
     'Ask Claude in a thread to put recurring work on a schedule, like a morning digest or a weekly report.': '在討論串中請 Claude 把重複性工作排入排程，例如每日晨間摘要或每週報告。',
-    'Ask for docs, files, artifacts, or folders in any thread. Claude can organize them in this panel.': '在任何討論串中要求 Claude 產生文件、檔案、Artifact 或資料夾，Claude 可以在這個面板中整理它們。',
+    'Ask for docs, files, artifacts, or folders in any thread. Claude can organize them in this panel.': '在任何討論串中要求 Claude 產生文件、檔案、作品或資料夾，Claude 可以在這個面板中整理它們。',
     'Authorize': '授權',
     'Auto memory': '自動記憶',
     'Auto-continue when usage limits reset': '用量上限重設後自動繼續',
@@ -515,7 +516,7 @@
     'Name and icon': '名稱與圖示',
     'Name this thread': '為此討論串命名',
     'Needs attention': '需要處理',
-    'New Slides and Design projects are created as artifacts.': '新的「投影片」與「設計」專案會以 Artifact 形式建立。',
+    'New Slides and Design projects are created as artifacts.': '新的「投影片」與「設計」專案會以作品形式建立。',
     'New session': '新工作階段',
     'Newest document available to open — press Tab until focus enters the card, Escape to return.': '有最新的文件可開啟 — 請按 Tab 直到焦點進入卡片，按 Escape 返回。',
     'No other files yet.': '尚無其他檔案。',
@@ -740,7 +741,7 @@
         /* ---- Projects 介面的數字與組合字串 ---- */
         [/^(\d+)\s+repl(?:y|ies)$/i, (m) => m[1] + ' 則回覆'],
         [/^Open thread — (\d+)\s+repl(?:y|ies)$/i, (m) => '開啟討論串 — ' + m[1] + ' 則回覆'],
-        [/^(\d+)\s+artifacts?$/i, (m) => m[1] + ' 個 Artifact'],
+        [/^(\d+)\s+artifacts?$/i, (m) => m[1] + ' 個作品'],
         [/^(\d+)\s+outputs?$/i, (m) => m[1] + ' 項輸出'],
         [/^(\d+)\s+more\s+outputs?$/i, (m) => '還有 ' + m[1] + ' 項輸出'],
         [/^(\d+)\s+more\s+outputs?\s+in\s+this\s+session$/i, (m) => '此工作階段還有 ' + m[1] + ' 項輸出'],
