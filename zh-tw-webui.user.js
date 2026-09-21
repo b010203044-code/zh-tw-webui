@@ -2,7 +2,7 @@
 // @name         繁體中文介面（Claude + GitHub）
 // @name:zh-TW   繁體中文介面（Claude + GitHub）
 // @namespace    https://github.com/b010203044-code/zh-tw-webui
-// @version      3.1.0
+// @version      3.2.0
 // @description  把 claude.ai 與 github.com 的「介面文字」換成繁體中文（台灣用語）。只翻譯介面，絕不更動對話內容、程式碼、檔名、議題內文等使用者資料。
 // @author       Harry
 // @match        https://claude.ai/*
@@ -51,6 +51,10 @@
         '[data-testid="file-thumbnail"]',
         '.katex'
       ],
+
+      /* 這些泛用單字只在 aria-label / title 等屬性裡翻譯。畫面上的文字節點不碰，
+         因為使用者的檔名、資料夾名、討論串名或專案名很可能剛好就叫這些字。 */
+      attrOnly: ['App', 'Other', 'Kind', 'Size', 'Goal', 'Grid', 'Extra', 'Input', 'Output', 'Read', 'Personal', 'Folder', 'Check', 'Environment', 'Developer', 'Organization', 'Models', 'Tokens'],
 
       dict: {
     /* ---- 側邊欄與導覽 ---- */
@@ -388,7 +392,210 @@
     'Just now': '剛剛',
     'a minute ago': '1 分鐘前',
     'an hour ago': '1 小時前',
-    'a day ago': '1 天前'
+    'a day ago': '1 天前',
+
+    /* ---- Projects 介面（討論串、資料庫、專案設定、用量）---- */
+    '(edited)': '（已編輯）',
+    'A button for each file that opens it — press Tab until focus enters the card, Escape to return.': '每個檔案都有一個可開啟它的按鈕 — 按 Tab 直到焦點進入卡片，按 Escape 返回。',
+    'A card with a "Start with a prompt" link is available — press Tab until focus enters the card, Escape to return.': '有一張含「從提示詞開始」連結的卡片 — 按 Tab 直到焦點進入卡片，按 Escape 返回。',
+    'A to Z': 'A 到 Z',
+    'Actions for Artifacts': 'Artifacts 的操作',
+    'Add a README': '新增 README',
+    'Add a file': '新增檔案',
+    'Add a folder': '新增資料夾',
+    'Add a repository': '新增儲存庫',
+    'Add reaction': '新增反應',
+    'Add scheduled task': '新增排程任務',
+    'All of your claude.ai connectors are available in every thread.': '你所有的 claude.ai 連接器在每個討論串中都能使用。',
+    'All repositories': '所有儲存庫',
+    'All types': '所有類型',
+    'And more — Power repository selection across code review, admin settings, and other GitHub-backed features.': '還有更多 — 在程式碼審查、管理員設定及其他以 GitHub 為基礎的功能中提供儲存庫選擇。',
+    'App': '應用程式',
+    'Archive project': '封存專案',
+    'Ask Claude a question or start a task…': '向 Claude 提問或開始一項任務…',
+    'Ask Claude in a thread to put recurring work on a schedule, like a morning digest or a weekly report.': '在討論串中請 Claude 把重複性工作排入排程，例如每日晨間摘要或每週報告。',
+    'Ask for docs, files, artifacts, or folders in any thread. Claude can organize them in this panel.': '在任何討論串中要求 Claude 產生文件、檔案、Artifact 或資料夾，Claude 可以在這個面板中整理它們。',
+    'Authorize': '授權',
+    'Auto memory': '自動記憶',
+    'Auto-continue when usage limits reset': '用量上限重設後自動繼續',
+    'Blocked': '受阻',
+    'Breakdown': '明細',
+    'Buttons that scroll the chat to where Claude used each one — press Tab until focus enters the card, Escape to return.': '這些按鈕會把交談捲動到 Claude 使用各項目的位置 — 按 Tab 直到焦點進入卡片，按 Escape 返回。',
+    'Cache hit': '快取命中',
+    'Cache read': '快取讀取',
+    'Cache write': '快取寫入',
+    'Check': '檢查',
+    'Check repository status': '檢查儲存庫狀態',
+    'Choose a repository to see if cloud sessions have access.': '選擇一個儲存庫，查看雲端工作階段是否有存取權。',
+    'Claude Code — Select repositories, browse branches, and track pull requests in remote sessions.': 'Claude Code — 在遠端工作階段中選擇儲存庫、瀏覽分支並追蹤合併請求。',
+    'Claude Design lives here now': 'Claude Design 現在移到這裡了',
+    'Claude Tag is set up from a Claude Team or Enterprise workspace. You may be signed in to a personal account. Try switching workspaces, or ask an organization owner to follow the setup guide.': 'Claude Tag 需從 Claude Team 或 Enterprise 工作區設定。你目前可能登入的是個人帳號。請嘗試切換工作區，或請組織擁有者依照設定指南操作。',
+    'Claude can create files': 'Claude 可以建立檔案',
+    'Claude is working': 'Claude 執行中',
+    'Claude sets up your project automatically': 'Claude 會自動設定你的專案',
+    'Claude will track your threads here as they start: what’s working, what’s waiting on you, and what’s done.': '討論串開始後，Claude 會在這裡追蹤：進行中、等待你處理，以及已完成的項目。',
+    'Cloud sessions only': '僅限雲端工作階段',
+    'Code changes': '程式碼變更',
+    'Completed threads file here.': '已完成的討論串會收錄在這裡。',
+    'Continue on GitHub': '在 GitHub 上繼續',
+    'Coordinated': '已協調',
+    'Coordinator': '協調者',
+    'Coordinator effort': '協調者投入程度',
+    'Coordinator model': '協調者模型',
+    'Copy ID': '複製 ID',
+    'Copy report': '複製報告',
+    'Created by you': '由你建立',
+    'Customize project icon and color': '自訂專案圖示與顏色',
+    'Danger zone': '危險區域',
+    'Date modified': '修改日期',
+    'Decisions, reviews, and permissions only you can give.': '只有你能給予的決定、審查與權限。',
+    'Default (High)': '預設（高）',
+    'Default (Low)': '預設（低）',
+    'Default effort for new threads.': '新討論串的預設投入程度。',
+    'Default model for new threads.': '新討論串的預設模型。',
+    'Design System': '設計系統',
+    'Design, Beta': '設計，Beta',
+    'Developer': '開發者',
+    'Dictation settings': '聽寫設定',
+    'Docs': '文件',
+    'Docs, Beta': '文件，Beta',
+    'Drag or move sessions here': '將工作階段拖曳或移動到這裡',
+    'Edit details': '編輯詳細資料',
+    'Effort': '投入程度',
+    'Effort for managing and creating threads.': '管理與建立討論串時的投入程度。',
+    'Environment': '環境',
+    'Extra': '額外',
+    'Filter by': '篩選依據',
+    'Folder': '資料夾',
+    'Folders and files live in the Library': '資料夾與檔案都放在資料庫中',
+    'GitHub account connected': 'GitHub 帳號已連接',
+    'GitHub repo': 'GitHub 儲存庫',
+    'Go to chat': '前往交談',
+    'Goal': '目標',
+    'Grid': '格狀',
+    'Grid view': '格狀檢視',
+    'Hide this project from the sidebar and archive its threads. This can be undone at any time.': '將此專案從側邊欄隱藏並封存其討論串。此操作隨時可以復原。',
+    'Included in the report': '已包含在報告中',
+    'Includes a document': '包含文件',
+    'Input': '輸入',
+    'Install': '安裝',
+    'Install & Authorize': '安裝並授權',
+    'Kind': '類型',
+    'Layout': '版面配置',
+    'Like a CLAUDE.md: instructions and rules you write that every new thread reads and follows.': '就像 CLAUDE.md：由你撰寫、每個新討論串都會讀取並遵循的指示與規則。',
+    'Make something new': '建立新內容',
+    'Manage connectors': '管理連接器',
+    'Memory files': '記憶檔案',
+    'Model for managing and creating threads.': '用於管理與建立討論串的模型。',
+    'Models': '模型',
+    'Move down': '下移',
+    'Name and icon': '名稱與圖示',
+    'Name this thread': '為此討論串命名',
+    'Needs attention': '需要處理',
+    'New Slides and Design projects are created as artifacts.': '新的「投影片」與「設計」專案會以 Artifact 形式建立。',
+    'New session': '新工作階段',
+    'Newest document available to open — press Tab until focus enters the card, Escape to return.': '有最新的文件可開啟 — 請按 Tab 直到焦點進入卡片，按 Escape 返回。',
+    'No other files yet.': '尚無其他檔案。',
+    'No repositories yet — use Add to connect one.': '尚無儲存庫 — 請使用「新增」連接一個。',
+    'Notes Claude writes itself as it works in this project.': 'Claude 在此專案中工作時自行寫下的筆記。',
+    'Nothing is waiting on you.': '沒有待你處理的事項。',
+    'Only select repositories': '僅限選取的儲存庫',
+    'Open Library': '開啟資料庫',
+    'Open MEMORY.md': '開啟 MEMORY.md',
+    'Organization': '組織',
+    'Other': '其他',
+    'Output': '輸出',
+    'Output list available — press Tab until focus enters the card, Escape to return.': '有輸出清單可檢視 — 請按 Tab 直到焦點進入卡片，按 Escape 返回。',
+    'Overview': '總覽',
+    'Pause': '暫停',
+    'Pause project': '暫停專案',
+    'Pause the coordinator and new thread creation. This can be undone at any time.': '暫停協調者與新討論串的建立。此操作隨時可以復原。',
+    'Permanently delete this project and all of its threads. This cannot be undone.': '永久刪除此專案及其所有討論串。此操作無法復原。',
+    'Personal': '個人',
+    'Press and hold to record': '按住以錄音',
+    'Problem description': '問題描述',
+    'Project ID': '專案 ID',
+    'Project content': '專案內容',
+    'Project options': '專案選項',
+    'Project repositories': '專案儲存庫',
+    'Project settings': '專案設定',
+    'Project status page': '專案狀態頁面',
+    'Project storage': '專案儲存空間',
+    'Projects can run several threads at once and draw down your usage faster.': '專案可同時執行多個討論串，會更快消耗你的用量。',
+    'Read': '讀取',
+    'Read access to commit statuses and metadata': '讀取 commit 狀態與中繼資料的權限',
+    'Read every thread': '讀取所有討論串',
+    'Reconnect the Claude GitHub App': '重新連接 Claude GitHub App',
+    'Recycle the worker running this project’s coordinator. Any in-flight turn will be interrupted.': '回收重啟執行此專案協調者的工作處理程序（worker）。任何進行中的回合都會被中斷。',
+    'Release to unpin': '放開以取消釘選',
+    'Reorder Idle': '重新排序「閒置」',
+    'Reorder Resolved': '重新排序「已解決」',
+    'Reorder Waiting on you': '重新排序「等待你處理」',
+    'Reorder Working': '重新排序「執行中」',
+    'Report a problem': '回報問題',
+    'Repositories': '儲存庫',
+    'Repository': '儲存庫',
+    'Repository access': '儲存庫存取權',
+    'Reset to defaults': '重設為預設值',
+    'Resize': '調整大小',
+    'Resolve': '解決',
+    'Resolved': '已解決',
+    'Restart': '重新啟動',
+    'Restart Claude': '重新啟動 Claude',
+    'Search library': '搜尋資料庫',
+    'Search models…': '搜尋模型…',
+    'Search projects...': '搜尋專案…',
+    'Search recents...': '搜尋最近項目…',
+    'Search this project': '搜尋此專案',
+    'Search threads': '搜尋討論串',
+    'Search your activity': '搜尋你的活動',
+    'Select a cloud environment': '選擇雲端環境',
+    'Select repositories you want in every thread. Claude adds others as needed.': '選擇你希望每個討論串都納入的儲存庫。Claude 會視需要新增其他儲存庫。',
+    'Send a message to get started.': '傳送訊息以開始。',
+    'Sending': '傳送中',
+    'Set up Claude Tag': '設定 Claude Tag',
+    'Settings sections': '設定區段',
+    'Setup recommendations': '設定建議',
+    'Show empty groups': '顯示空的群組',
+    'Size': '大小',
+    'Slides': '投影片',
+    'Slides, Beta': '投影片，Beta',
+    'Sort applies to search results': '排序會套用至搜尋結果',
+    'Sort tasks': '排序任務',
+    'Sources:': '來源：',
+    'Start thread': '開始討論串',
+    'Steer this thread…': '引導此討論串…',
+    'Suggest a name': '建議名稱',
+    'Suggested threads': '建議的討論串',
+    'Suggestions': '建議',
+    'The Claude GitHub App needs to be reconnected so Claude can work with your repositories.': '需要重新連接 Claude GitHub App，Claude 才能操作你的儲存庫。',
+    'The outcome you want the coordinator to work toward.': '你希望協調者達成的結果。',
+    'This applies to all current and future repositories owned by the resource owner. Also includes public repositories (read-only).': '這適用於資源擁有者所擁有的所有現有與未來的儲存庫，也包含公開儲存庫（唯讀）。',
+    'This project': '本專案',
+    'Thread actions': '討論串操作',
+    'Thread effort': '討論串投入程度',
+    'Thread model': '討論串模型',
+    'Thread name': '討論串名稱',
+    'Threads': '討論串',
+    'Threads that stop on a usage limit pick up where they left off when the limit resets. Applies to every thread in this project.': '因達到用量上限而停止的討論串，會在上限重設後從中斷處繼續。此設定套用於本專案的所有討論串。',
+    'To pick up a section, press Space or Enter. While it is picked up, press the up or down arrow key to move it, Space or Enter to drop it, or Escape to cancel.': '要抓取某個區段，請按空白鍵或 Enter。抓取後，按上或下方向鍵移動，按空白鍵或 Enter 放下，或按 Escape 取消。',
+    'Tokens': 'Token 數',
+    'Try asking Claude to work on several things in parallel': '試試看讓 Claude 同時處理多件事情',
+    'Ungrouped': '未分組',
+    'Unpin project': '取消釘選專案',
+    'Update setup': '重新執行設定',
+    'Updating thread': '正在更新討論串',
+    'Uploads': '上傳的檔案',
+    'Usage limit': '用量上限',
+    'Used in this session': '本工作階段已使用',
+    'Viewed': '已檢視',
+    'Visit the standalone homepage': '前往獨立首頁',
+    'Waiting on you': '等待你處理',
+    'What happened, and what did you expect?': '發生了什麼事？你原本預期的結果是什麼？',
+    'Working': '執行中',
+    'Working…': '執行中…',
+    'Your projects': '你的專案',
+    'Your threads show up here as Claude works.': '當 Claude 執行工作時，你的討論串會顯示在這裡。'
       },
 
       patterns: [
@@ -407,7 +614,28 @@
     [/^(\d+)\s+sources?$/i, (m) => m[1] + ' 個來源'],
     [/^(\d+)\s+results?$/i, (m) => m[1] + ' 筆結果'],
     [/^Version\s+(\d+)$/i, (m) => '版本 ' + m[1]],
-    [/^Showing\s+(\d+)\s+of\s+(\d+)$/i, (m) => '顯示 ' + m[1] + ' / ' + m[2]]
+    [/^Showing\s+(\d+)\s+of\s+(\d+)$/i, (m) => '顯示 ' + m[1] + ' / ' + m[2]],
+        /* ---- Projects 介面的數字與組合字串 ---- */
+        [/^(\d+)\s+repl(?:y|ies)$/i, (m) => m[1] + ' 則回覆'],
+        [/^Open thread — (\d+)\s+repl(?:y|ies)$/i, (m) => '開啟討論串 — ' + m[1] + ' 則回覆'],
+        [/^(\d+)\s+artifacts?$/i, (m) => m[1] + ' 個 Artifact'],
+        [/^(\d+)\s+outputs?$/i, (m) => m[1] + ' 項輸出'],
+        [/^(\d+)\s+more\s+outputs?$/i, (m) => '還有 ' + m[1] + ' 項輸出'],
+        [/^(\d+)\s+more\s+outputs?\s+in\s+this\s+session$/i, (m) => '此工作階段還有 ' + m[1] + ' 項輸出'],
+        [/^(\d+)\s+more\s+outputs?\s+—\s+press Tab until focus enters the card, Escape to return\.$/i,
+          (m) => '還有 ' + m[1] + ' 項輸出 — 按 Tab 直到焦點進入卡片，按 Escape 返回。'],
+        [/^(\d+)\s+searches?$/i, (m) => m[1] + ' 次搜尋'],
+        [/^(\d+)\s+threads?\s+(?:is|are)\s+waiting on you\.$/i, (m) => '有 ' + m[1] + ' 個討論串正在等待你處理。'],
+        [/^(\d+)\s+threads?\s+waiting on you$/i, (m) => m[1] + ' 個討論串等待你處理'],
+        [/^(\d+)%\s+of\s+(\d+)-hour limit$/i, (m) => m[2] + ' 小時上限的 ' + m[1] + '%'],
+        [/^(\d+)\s+of\s+([\d,]+)\s+files$/i, (m) => m[1] + ' / ' + m[2] + ' 個檔案'],
+        [/^Selected (\d+) repositor(?:y|ies)\.$/i, (m) => '已選取 ' + m[1] + ' 個儲存庫。'],
+        [/^Filter by type: (.+)$/, (m) => '依類型篩選：' + (translateString(m[1], true) || m[1])],
+        [/^Default \((.+)\)$/, (m) => '預設（' + (translateString(m[1], true) || m[1]) + '）'],
+        [/^Up to \$([\d,]+) of initial usage$/i, (m) => '最多 $' + m[1] + ' 的初始用量'],
+        /* 第三個元素 true 代表「只在屬性裡套用」——這條太寬鬆，
+           畫面上剛好叫「something icon」的檔案不該被改掉。 */
+        [/^(.+) icon$/, (m) => m[1] + ' 圖示', true]
       ]
     },
 
@@ -796,7 +1024,22 @@
     'Yesterday': '昨天',
     'Today': '今天',
     'now': '剛剛',
-    'This action cannot be undone.': '此動作無法復原。'
+    'This action cannot be undone.': '此動作無法復原。',
+
+    /* ---- Claude GitHub App 安裝與授權頁 ---- */
+    'And more — Power repository selection across code review, admin settings, and other GitHub-backed features.': '還有更多 — 在程式碼審查、管理員設定及其他以 GitHub 為基礎的功能中提供儲存庫選擇。',
+    'Authorize': '授權',
+    'Check repository status': '檢查儲存庫狀態',
+    'Choose a repository to see if cloud sessions have access.': '選擇一個儲存庫，查看雲端工作階段是否有存取權。',
+    'Claude Code — Select repositories, browse branches, and track pull requests in remote sessions.': 'Claude Code — 在遠端工作階段中選擇儲存庫、瀏覽分支並追蹤合併請求。',
+    'Cloud sessions only': '僅限雲端工作階段',
+    'Continue on GitHub': '在 GitHub 上繼續',
+    'GitHub account connected': 'GitHub 帳號已連接',
+    'Install & Authorize': '安裝並授權',
+    'Read access to commit statuses and metadata': '讀取 commit 狀態與中繼資料的權限',
+    'Reconnect the Claude GitHub App': '重新連接 Claude GitHub App',
+    'The Claude GitHub App needs to be reconnected so Claude can work with your repositories.': '需要重新連接 Claude GitHub App，Claude 才能操作你的儲存庫。',
+    'This applies to all current and future repositories owned by the resource owner. Also includes public repositories (read-only).': '這適用於資源擁有者所擁有的所有現有與未來的儲存庫，也包含公開儲存庫（唯讀）。'
       },
 
       patterns: [
@@ -846,10 +1089,11 @@
    * 3. 核心：字串查表
    * ------------------------------------------------------------------ */
   const LOOKUP = new Map();
-  for (const key of Object.keys(DICT)) {
-    LOOKUP.set(normalize(key), DICT[key]);
-    LOOKUP.set(normalize(key).toLowerCase(), DICT[key]);
-  }
+  for (const key of Object.keys(DICT)) LOOKUP.set(normalize(key), DICT[key]);
+
+  // 只在屬性裡翻譯的泛用單字。大小寫必須完全相符——以前會連小寫一起比對，
+  // 結果像 docs、other、size 這種使用者自己取的檔名也會被改掉。
+  const ATTR_ONLY = new Set((site.attrOnly || []).map(normalize));
 
   function normalize(s) {
     return s
@@ -865,13 +1109,15 @@
     return s.length > 0 && s.length < 200 && /[A-Za-z]/.test(s) && !/[一-鿿]/.test(s);
   }
 
-  function translateString(raw) {
+  function translateString(raw, isAttr) {
     if (!looksTranslatable(raw)) return null;
     const key = normalize(raw);
     if (!key) return null;
-    const hit = LOOKUP.get(key) || LOOKUP.get(key.toLowerCase());
+    if (!isAttr && ATTR_ONLY.has(key)) return null;
+    const hit = LOOKUP.get(key);
     if (hit) return hit;
-    for (const [re, fn] of PATTERNS) {
+    for (const [re, fn, attrOnly] of PATTERNS) {
+      if (attrOnly && !isAttr) continue;
       const m = key.match(re);
       if (m) return fn(m);
     }
@@ -894,7 +1140,7 @@
     const parent = node.parentElement;
     if (!parent || isProtected(parent)) return;
 
-    const translated = translateString(raw);
+    const translated = translateString(raw, false);
     if (!translated) return;
 
     // 保留原本的前後空白，避免破版
@@ -910,7 +1156,7 @@
     for (const attr of ATTRS) {
       if (!el.hasAttribute(attr)) continue;
       const raw = el.getAttribute(attr);
-      const translated = translateString(raw);
+      const translated = translateString(raw, true);
       if (translated && translated !== raw) el.setAttribute(attr, translated);
     }
   }
