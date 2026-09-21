@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         繁體中文介面（Claude + GitHub） v3.9.0
-// @name:zh-TW   繁體中文介面（Claude + GitHub） v3.9.0
+// @name         繁體中文介面（Claude + GitHub） v3.10.0
+// @name:zh-TW   繁體中文介面（Claude + GitHub） v3.10.0
 // @namespace    https://github.com/b010203044-code/zh-tw-webui
-// @version      3.9.0
+// @version      3.10.0
 // @description  把 claude.ai 與 github.com 的「介面文字」換成繁體中文（台灣用語）。只翻譯介面，絕不更動對話內容、程式碼、檔名、議題內文等使用者資料。
 // @author       Harry
 // @match        https://claude.ai/*
@@ -19,7 +19,7 @@
 
   /* 版本號。改版時四個地方要一起改：@name、@name:zh-TW、@version、這裡。
      @name 帶版本號是為了在油猴控制台與動作選單上一眼看得出跑的是哪一版。 */
-  const VERSION = '3.9.0';
+  const VERSION = '3.10.0';
 
   /* ------------------------------------------------------------------ *
    * 1. 共用保護區：所有站台都不動這些地方的文字
@@ -62,6 +62,17 @@
                  'Personal', 'Folder', 'Check', 'Environment', 'Developer', 'Organization', 'Models',
                  'Tokens', 'Project', 'Select', 'Thread', 'Mode', 'Move', 'Prompt', 'High', 'Low',
                  'All', 'Active', 'Idle', 'Name', 'Type', 'Status'],
+
+      /* 刻意不翻、也不要再回報的字串（v3.10.0 新增）。
+         產品名、品牌名、方案名、按鍵名這類本來就該保留英文，
+         但它們每次瀏覽都會再出現在盤點清單裡，變成固定雜訊。
+         列在這裡只影響「要不要回報」，不影響翻譯行為。
+         理由逐條記在 repo 的 未採用字串.md。 */
+      never: ['Anthropic', 'Anthropic PBC', 'PBC', 'Claude', 'Claude Code', 'Claude Pro', 'Claude Max',
+              'Opus', 'Sonnet', 'Haiku', 'Opus 5', 'Opus 4.8', 'Sonnet 5', 'Haiku 4.5',
+              'Pro', 'Max', 'Artifact', 'Artifacts', 'MCP', 'API',
+              'CDN', 'Chromium', 'GitHub', 'Tampermonkey', 'Ctrl', 'Shift', 'Alt', 'Enter', 'Esc',
+              'Escape', 'Tab', 'Backspace', 'Cmd', 'Option', 'README', 'LICENSE'],
 
       dict: {
     /* ---- 側邊欄與導覽 ---- */
@@ -674,6 +685,8 @@
 
     /* ---- 用量 ---- */
     'Approaching session usage limit': '接近工作階段用量上限',
+    'Approaching weekly usage limit': '接近每週用量上限',
+    'Plan usage, Compacts automatically': '方案用量，自動壓縮',
     'Resets at': '重設時間',
 
     /* ---- 其他 ---- */
@@ -688,6 +701,10 @@
       },
 
       patterns: [
+    /* 側邊欄用量的 aria-label。百分比與重設時間會變動，所以用規則；
+       時間本身照原樣帶入，不翻（日期時間一律不動）。 */
+    [/^Usage: Weekly · all models: (\d+)%, Resets (.+), Compacts automatically$/,
+      (m) => '用量：每週 · 所有模型：' + m[1] + '%，' + m[2] + ' 重設，自動壓縮', true],
     [/^(\d+)\s+minutes?\s+ago$/i, (m) => m[1] + ' 分鐘前'],
     [/^(\d+)\s+hours?\s+ago$/i, (m) => m[1] + ' 小時前'],
     [/^(\d+)\s+days?\s+ago$/i, (m) => m[1] + ' 天前'],
@@ -1220,6 +1237,9 @@
   // 結果像 docs、other、size 這種使用者自己取的檔名也會被改掉。
   const ATTR_ONLY = new Set((site.attrOnly || []).map(normalize));
 
+  // 刻意不翻也不回報的字串（產品名、按鍵名…）。只影響盤點與累積，不影響翻譯。
+  const NEVER = new Set((site.never || []).map(normalize));
+
   function normalize(s) {
     return s
       .replace(/ /g, ' ')
@@ -1241,13 +1261,33 @@
   /* 判斷「這看起來是資料，不是介面文字」。
      9:55 AM、363.5k、21.3 kB、3m、Jul 11 這些都含有英文字母，
      光看「有沒有字母」會把它們算成漏翻，那正是雜訊的來源。
-     規則：帶數字而字母很少（單位、AM/PM、月份縮寫），或整串只有一個字母。
-     診斷與背景累積共用同一套判斷，兩邊結果才會一致。 */
+     診斷與背景累積共用同一套判斷，兩邊結果才會一致。
+     注意：這個函式只影響「要不要回報」，不影響翻不翻——翻譯永遠只認字典與規則。
+
+     v3.10.0 依第一份累積清單的實際內容補了幾類（韓文頁尾、網址、email、
+     檔名、儲存庫路徑、日期），那些每次瀏覽都會再出現，不濾掉就是固定雜訊。 */
+  const DATE_WORDS = /(Mon|Tue|Wed|Thu|Fri|Sat|Sun|Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)/;
+
   function looksLikeData(s) {
     const letters = s.replace(/[^A-Za-z]/g, '');
     if (letters.length === 0) return true;             // 純數字、日期、符號
     if (letters.length <= 1) return true;              // 單字元標籤：x、+、v
     if (/\d/.test(s) && letters.length <= 3) return true; // 9:55 AM、363.5k、Jul 11
+
+    // 諺文或假名：不是英文介面，是別的語言的頁尾或內容（例如韓國法人資訊）
+    if (/[\uAC00-\uD7AF\u3040-\u30FF]/.test(s)) return true;
+
+    // 網址、email
+    if (/:\/\//.test(s) || /^www\./i.test(s)) return true;
+    if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s)) return true;
+
+    // 整串沒有空白又帶著 . 或 /：檔名、網域、儲存庫路徑（README.md、github.com、owner/repo）
+    if (!/\s/.test(s) && /[./]/.test(s)) return true;
+
+    // 短句型的日期：Monday, September 21, 2026／Sun, Sep 27, 5:00 PM
+    // 限定 30 字以內，免得把含日期的完整介面句子也濾掉
+    if (s.length <= 30 && /\d/.test(s) && DATE_WORDS.test(s)) return true;
+
     return false;
   }
 
@@ -1315,6 +1355,7 @@
     if (!key || collected.has(key)) return;
     if (looksLikeData(key)) return;
     if (!isAttr && ATTR_ONLY.has(key)) return;    // 泛用單字，畫面上本來就不翻
+    if (NEVER.has(key)) return;                   // 產品名、按鍵名，刻意保留英文
     if (collected.size >= COLLECT_MAX) {
       collectFull = true;
       console.warn('[zh-tw-webui] 累積已達上限 ' + COLLECT_MAX + ' 條，先按 Ctrl + Alt + E 匯出。');
@@ -1512,6 +1553,7 @@
       hasEntry: 0,         // 有對應條目（翻譯開著時幾乎為 0，因為早就變中文了）
       protectedZone: 0,    // 在保護區裡，規定不能翻
       attrOnlySkipped: 0,  // 泛用單字，只在屬性裡翻
+      deliberate: 0,       // 產品名、按鍵名，刻意保留英文
       alreadyChinese: 0,   // 已經是中文（多數是翻好的）
       looksLikeData: 0     // 數字、日期、時間、檔案大小、單字元標籤
     };
@@ -1524,6 +1566,7 @@
       if (!key) { stats.looksLikeData++; return; }
       if (!isAttr && inProtected) { stats.protectedZone++; return; }
       if (!isAttr && ATTR_ONLY.has(key)) { stats.attrOnlySkipped++; return; }
+      if (NEVER.has(key)) { stats.deliberate++; return; }
       if (translateString(raw, isAttr)) { stats.hasEntry++; return; }
       if (!looksTranslatable(raw)) { stats.looksLikeData++; return; }  // 太長，引擎本來就不看
       stats.missing++;
@@ -1558,6 +1601,7 @@
       '\n  已經是中文：          ' + stats.alreadyChinese + ' 處' +
       '\n  看起來是資料：        ' + stats.looksLikeData + ' 處（數字、日期、時間、檔案大小）' +
       '\n  泛用單字只翻屬性：    ' + stats.attrOnlySkipped + ' 處' +
+      '\n  刻意保留英文：        ' + stats.deliberate + ' 處（產品名、按鍵名）' +
       '\n  有對應條目：          ' + stats.hasEntry + ' 處'
     );
     console.log(report);
