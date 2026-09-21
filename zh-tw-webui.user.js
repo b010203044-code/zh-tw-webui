@@ -2,7 +2,7 @@
 // @name         繁體中文介面（Claude + GitHub）
 // @name:zh-TW   繁體中文介面（Claude + GitHub）
 // @namespace    https://github.com/b010203044-code/zh-tw-webui
-// @version      3.5.0
+// @version      3.6.0
 // @description  把 claude.ai 與 github.com 的「介面文字」換成繁體中文（台灣用語）。只翻譯介面，絕不更動對話內容、程式碼、檔名、議題內文等使用者資料。
 // @author       Harry
 // @match        https://claude.ai/*
@@ -633,7 +633,10 @@
 
     /* ---- 訊息與交談 ---- */
     'Chat messages': '交談訊息',
+    'Message actions': '訊息操作',
     'Show message actions': '顯示訊息操作',
+    'Claude finished the response': 'Claude 已完成回覆',
+    'Reply': '回覆',
     'Unread response': '未讀回覆',
     'New from a template': '從範本建立',
     'Customize': '自訂',
@@ -653,6 +656,10 @@
 
     /* ---- 其他 ---- */
     '(opens in new tab)': '（在新分頁開啟）',
+    /* 這兩條是同一句被 DOM 切成三個文字節點的兩端：Added ｜ <儲存庫名> ｜ to this thread。
+       下面 patterns 的 ^Added (.+) to this thread$ 只在整句同一個節點時才會命中，實際頁面不會。 */
+    'Added': '已新增',
+    'to this thread': '至此討論串',
     'Get apps and extensions': '取得應用程式與擴充功能',
     'Repository and pull request controls': '儲存庫與合併請求控制項',
     'Arrow keys move the tile. Perpendicular arrows preview a split; press Enter to commit or Escape to cancel.': '方向鍵可移動磚塊。垂直方向的方向鍵會預覽分割；按 Enter 確認，按 Escape 取消。'
@@ -699,7 +706,7 @@
         /* aria-label 專用：畫面上叫「Actions for 某某」的文字節點不該被動到 */
         [/^Actions for (.+)$/, (m) => m[1] + ' 的操作', true],
         [/^Connectors: (.+)$/, (m) => '連接器：' + m[1]],
-        [/^Added (.+) to this thread$/, (m) => '已將 ' + m[1] + ' 加入此討論串'],
+        [/^Added (.+) to this thread$/, (m) => '已新增 ' + m[1] + ' 至此討論串'],
         [/^Daily at (.+)$/, (m) => '每天 ' + m[1]],
         [/^Sort by: (.+)$/, (m) => '排序：' + (translateString(m[1], true) || m[1])],
         [/^Good (morning|afternoon|evening), (.+)$/,
@@ -1434,7 +1441,7 @@
   }
 
   // 也掛到 window，方便直接在主控台叫：zhTwWebui.diagnose()
-  try { window.zhTwWebui = { diagnose: diagnose, version: '3.5.0', site: site.label }; } catch (e) { /* ignore */ }
+  try { window.zhTwWebui = { diagnose: diagnose, version: '3.6.0', site: site.label }; } catch (e) { /* ignore */ }
 
   function toast(text) {
     const el = document.createElement('div');
