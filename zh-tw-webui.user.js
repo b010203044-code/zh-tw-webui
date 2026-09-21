@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         繁體中文介面（Claude + GitHub） v3.10.0
-// @name:zh-TW   繁體中文介面（Claude + GitHub） v3.10.0
+// @name         繁體中文介面（Claude + GitHub） v3.11.0
+// @name:zh-TW   繁體中文介面（Claude + GitHub） v3.11.0
 // @namespace    https://github.com/b010203044-code/zh-tw-webui
-// @version      3.10.0
+// @version      3.11.0
 // @description  把 claude.ai 與 github.com 的「介面文字」換成繁體中文（台灣用語）。只翻譯介面，絕不更動對話內容、程式碼、檔名、議題內文等使用者資料。
 // @author       Harry
 // @match        https://claude.ai/*
@@ -19,7 +19,7 @@
 
   /* 版本號。改版時四個地方要一起改：@name、@name:zh-TW、@version、這裡。
      @name 帶版本號是為了在油猴控制台與動作選單上一眼看得出跑的是哪一版。 */
-  const VERSION = '3.10.0';
+  const VERSION = '3.11.0';
 
   /* ------------------------------------------------------------------ *
    * 1. 共用保護區：所有站台都不動這些地方的文字
@@ -269,6 +269,7 @@
     'No files yet': '尚未有檔案',
     'Private': '私人',
     'Shared': '共用',
+    'Shared with you': '與你共用',
     'Shared with your organization': '與你的組織共用',
     'Only you can see this': '只有你看得到',
     'Members': '成員',
@@ -479,6 +480,7 @@
     'Docs, Beta': '文件，Beta',
     'Drag or move sessions here': '將工作階段拖曳或移動到這裡',
     'Edit details': '編輯詳細資料',
+    'Edited': '已編輯',
     'Effort': '投入程度',
     'Effort for managing and creating threads.': '管理與建立討論串時的投入程度。',
     'Environment': '環境',
@@ -613,6 +615,7 @@
     'Working': '執行中',
     'Working…': '執行中…',
     'Your projects': '你的專案',
+    'Yours': '你的',
     'Your threads show up here as Claude works.': '當 Claude 執行工作時，你的討論串會顯示在這裡。',
 
     /* ---- 泛用標示。單獨的泛用單字都列在上面的 attrOnly，只在屬性裡生效 ---- */
@@ -711,6 +714,16 @@
     [/^(\d+)\s+weeks?\s+ago$/i, (m) => m[1] + ' 週前'],
     [/^(\d+)\s+months?\s+ago$/i, (m) => m[1] + ' 個月前'],
     [/^(\d+)\s+years?\s+ago$/i, (m) => m[1] + ' 年前'],
+    /* Artifacts 與資料庫清單用的是縮寫相對時間（2h ago、5m ago）。
+       上面那組只吃完整寫法，所以這一頁的時間整片都沒翻到。
+       每條都有 ^$ 錨點，`2mo ago` 不會被 `m` 那條吃掉。日期本身（Jul 16）維持不動。 */
+    [/^(\d+)\s*s\s+ago$/i, (m) => m[1] + ' 秒前'],
+    [/^(\d+)\s*mo\s+ago$/i, (m) => m[1] + ' 個月前'],
+    [/^(\d+)\s*m\s+ago$/i, (m) => m[1] + ' 分鐘前'],
+    [/^(\d+)\s*h\s+ago$/i, (m) => m[1] + ' 小時前'],
+    [/^(\d+)\s*d\s+ago$/i, (m) => m[1] + ' 天前'],
+    [/^(\d+)\s*w\s+ago$/i, (m) => m[1] + ' 週前'],
+    [/^(\d+)\s*y\s+ago$/i, (m) => m[1] + ' 年前'],
     [/^Last\s+(\d+)\s+days$/i, (m) => '過去 ' + m[1] + ' 天'],
     [/^(\d+)\s+messages?\s+(?:left|remaining)$/i, (m) => '剩餘 ' + m[1] + ' 則訊息'],
     [/^(\d+)\s+files?$/i, (m) => m[1] + ' 個檔案'],
