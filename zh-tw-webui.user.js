@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         繁體中文介面（Claude + GitHub）
-// @name:zh-TW   繁體中文介面（Claude + GitHub）
+// @name         繁體中文介面（Claude + GitHub） v3.8.0
+// @name:zh-TW   繁體中文介面（Claude + GitHub） v3.8.0
 // @namespace    https://github.com/b010203044-code/zh-tw-webui
-// @version      3.7.0
+// @version      3.8.0
 // @description  把 claude.ai 與 github.com 的「介面文字」換成繁體中文（台灣用語）。只翻譯介面，絕不更動對話內容、程式碼、檔名、議題內文等使用者資料。
 // @author       Harry
 // @match        https://claude.ai/*
@@ -16,6 +16,10 @@
 
 (function () {
   'use strict';
+
+  /* 版本號。改版時三個地方要一起改：@name、@version、這裡。
+     @name 帶版本號是為了在油猴控制台與動作選單上一眼看得出跑的是哪一版。 */
+  const VERSION = '3.8.0';
 
   /* ------------------------------------------------------------------ *
    * 1. 共用保護區：所有站台都不動這些地方的文字
@@ -1190,6 +1194,18 @@
   const site = SITES.find((s) => s.match.test(location.hostname));
   if (!site) return;
 
+  /* 重複安裝保護（v3.8.0）
+     @name 帶了版本號，所以每次改版名稱都會變。自動更新是原地覆蓋沒問題，
+     但若手動再從 raw 連結裝一次，油猴會當成新腳本、多出一份，兩份同時跑
+     會讓 Ctrl + Alt + T 互相抵銷。先跑到的那份留下，後到的直接退出。 */
+  if (window.zhTwWebui && window.zhTwWebui.version) {
+    console.warn(
+      '[zh-tw-webui] 偵測到重複安裝：v' + window.zhTwWebui.version + ' 已經在跑，這一份 v' +
+      VERSION + ' 不啟動。請到油猴控制台把多餘的那一份刪掉。'
+    );
+    return;
+  }
+
   const DICT = site.dict;
   const PATTERNS = site.patterns;
   const PROTECTED_SELECTOR = BASE_PROTECTED.concat(site.protect).join(',');
@@ -1430,11 +1446,11 @@
     const list = Array.from(missing.values()).sort((a, b) => a.localeCompare(b));
     const report =
       '# 這一頁還沒翻到的介面字串（' + list.length + ' 條，已去重複）\n' +
-      '# 站台：' + site.label + '　字典：' + LOOKUP.size + ' 條　規則：' + PATTERNS.length + ' 條\n\n' +
+      '# 站台：' + site.label + '　版本：v' + VERSION + '　字典：' + LOOKUP.size + ' 條　規則：' + PATTERNS.length + ' 條\n\n' +
       list.join('\n');
 
     console.log(
-      '%c[zh-tw-webui] 盤點結果',
+      '%c[zh-tw-webui v' + VERSION + '] 盤點結果',
       'font-weight:bold',
       '\n  還沒翻到（去重複後）：' + list.length + ' 條　← 只有這些需要回報' +
       '\n  （出現次數：' + stats.missing + ' 處）' +
@@ -1459,7 +1475,7 @@
   }
 
   // 也掛到 window，方便直接在主控台叫：zhTwWebui.diagnose()
-  try { window.zhTwWebui = { diagnose: diagnose, version: '3.7.0', site: site.label }; } catch (e) { /* ignore */ }
+  try { window.zhTwWebui = { diagnose: diagnose, version: VERSION, site: site.label }; } catch (e) { /* ignore */ }
 
   function toast(text) {
     const el = document.createElement('div');
