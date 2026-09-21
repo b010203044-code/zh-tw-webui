@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         繁體中文介面（Claude + GitHub） v3.11.0
-// @name:zh-TW   繁體中文介面（Claude + GitHub） v3.11.0
+// @name         繁體中文介面（Claude + GitHub） v3.11.1
+// @name:zh-TW   繁體中文介面（Claude + GitHub） v3.11.1
 // @namespace    https://github.com/b010203044-code/zh-tw-webui
-// @version      3.11.0
+// @version      3.11.1
 // @description  把 claude.ai 與 github.com 的「介面文字」換成繁體中文（台灣用語）。只翻譯介面，絕不更動對話內容、程式碼、檔名、議題內文等使用者資料。
 // @author       Harry
 // @match        https://claude.ai/*
@@ -19,7 +19,7 @@
 
   /* 版本號。改版時四個地方要一起改：@name、@name:zh-TW、@version、這裡。
      @name 帶版本號是為了在油猴控制台與動作選單上一眼看得出跑的是哪一版。 */
-  const VERSION = '3.11.0';
+  const VERSION = '3.11.1';
 
   /* ------------------------------------------------------------------ *
    * 1. 共用保護區：所有站台都不動這些地方的文字
@@ -392,7 +392,10 @@
     'Required': '必填',
     'Optional': '選填',
     'Beta': 'Beta',
-    'New': '新',
+    /* 側邊欄左上角那顆按鈕的文字節點就是 New。
+       注意：claude.ai 的「新功能」小標籤用的也是同一個字，
+       引擎只比對字串、無法分辨位置，所以兩邊會一起變。 */
+    'New': '新的對話',
     'Coming soon': '即將推出',
     'This action cannot be undone.': '此動作無法復原。',
     'Are you sure?': '確定嗎？',
