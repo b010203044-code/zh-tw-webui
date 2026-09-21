@@ -70,6 +70,12 @@ Chrome 系列要多做一步：到 `chrome://extensions`，把右上角的**開�
 
 > `Artifacts` 原本歸在保留英文那欄，v3.12.0 改譯為「作品」。理由是那一頁裝的是文件、投影片、Design 與 HTML 檔，都是做完可以單獨打開的東西，「作品」涵蓋得到；「文件」已經被 `Docs` 用掉，會撞名。GitHub 的 `Artifacts`（Actions 工作流程的產出檔）是另一回事，維持英文。
 
+> v3.13.0 的幾個取捨：
+> - `Context` → 上下文、`Context window` → 上下文視窗，跟 Claude 官方中文文件一致。
+> - 表情符號的 shortcode（`:smile:`、`:point_up_2:`）**絕對不翻**，那是搜尋用的識別碼，翻了就搜不到。面板的分類標題（`Smileys & People` 等）才是介面，有翻。
+> - 作品頁的型別篩選 `Document` / `Design` 有翻成「文件」「設計」。代價是你的作品剛好叫這兩個字時也會被改到；要退掉就把字典裡那兩行搬到 `attrOnly`。
+> - 星期與上下午只在整句介面文字裡翻（`Resets Sun 5:00 PM` → 週日 下午 5:00 重設）。單獨的日期標籤（`Jul 16`、`July`）照舊維持英文。
+
 這只是預設，每一條都是字典裡的一行，想改哪個就改哪個。例如你想讓 `Pull requests` 維持英文，把那一行的值改成 `'Pull requests'` 就好。
 
 ---
@@ -162,6 +168,9 @@ attrOnly: ['App', 'Other', 'Kind', 'Size', 'Goal', 'Grid', 'List', 'Extra', 'Inp
   帶數字而字母很少的（`9:55 AM`、`363.5k`）、含諺文或假名的（韓文頁尾法人資訊）、
   網址與 email、整串沒有空白又帶 `.` 或 `/` 的（`README.md`、`github.com`、`owner/repo`）、
   30 字以內含星期或月份縮寫的日期（`Sun, Sep 27, 5:00 PM`）。
+  v3.13.0 再補三類：表情符號 shortcode（`:smile:`，一個 emoji 面板一次就吐一百多條）、
+  單獨的月份全名（`April`、`July`）、星期全名開頭的長日期
+  （`Monday, September 21, 2026 at 8:46:55 PM`，字數超過上面那條的 30 字上限）。
   這些每次瀏覽都會再出現，不濾掉就是固定雜訊。
 - **寫入有節流**：連續變動時合併成 2 秒一次寫入，不會每個字串都動一次 `localStorage`；
   離開頁面前（`pagehide`）再存一次，免得剛看到的幾條掉了。
@@ -191,6 +200,15 @@ attrOnly: ['App', 'Other', 'Kind', 'Size', 'Goal', 'Grid', 'List', 'Extra', 'Inp
 `Ctrl + Alt + E` 呼叫 `exportCollected()`（主控台是 `zhTwWebui.export()`），倒出背景累積的全部。
 `zhTwWebui.collected()` 可以隨時看現在累積了幾條。
 
+### 第 6.9 段：分頁標題（搜尋 `* 6.9`，v3.13.0 新增）
+
+分頁標題在 `<head>` 裡，而 `translateSubtree()` 只走 `document.body`，所以標題要單獨翻一次。
+claude.ai 換頁不重新載入、標題是直接改掉的，因此另外用一個 `MutationObserver` 盯著 `<title>`。
+
+規則是 patterns 裡的 `^(.+) - Claude$`：**前半查得到字典才翻，查不到就整串不動**。
+所以 `Artifacts - Claude` 會變成「作品 - Claude」，而 `My weird chat name - Claude`
+（你自己的交談名稱）完全不會被碰到。
+
 ### 第 7 段：啟動（搜尋 `* 7.`）
 
 `@run-at document-start` 表示腳本在 HTML 還沒解析完就執行，所以：
@@ -198,6 +216,7 @@ attrOnly: ['App', 'Other', 'Kind', 'Size', 'Goal', 'Grid', 'List', 'Extra', 'Inp
 1. 先掛上 `MutationObserver`，之後所有新出現的元素都會被處理。
 2. 再依 `document.readyState` 決定要等 `DOMContentLoaded` 還是直接掃描。
 3. `load` 事件再掃一次，補上晚到的內容。
+4. 每次掃描後翻一次分頁標題，並掛上 `<title>` 的監看（見上一段）。
 
 這樣安排的好處是**不會看到英文閃一下才變中文**。
 

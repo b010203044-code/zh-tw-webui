@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         繁體中文介面（Claude + GitHub） v3.12.0
-// @name:zh-TW   繁體中文介面（Claude + GitHub） v3.12.0
+// @name         繁體中文介面（Claude + GitHub） v3.13.0
+// @name:zh-TW   繁體中文介面（Claude + GitHub） v3.13.0
 // @namespace    https://github.com/b010203044-code/zh-tw-webui
-// @version      3.12.0
+// @version      3.13.0
 // @description  把 claude.ai 與 github.com 的「介面文字」換成繁體中文（台灣用語）。只翻譯介面，絕不更動對話內容、程式碼、檔名、議題內文等使用者資料。
 // @author       Harry
 // @match        https://claude.ai/*
@@ -19,7 +19,7 @@
 
   /* 版本號。改版時四個地方要一起改：@name、@name:zh-TW、@version、這裡。
      @name 帶版本號是為了在油猴控制台與動作選單上一眼看得出跑的是哪一版。 */
-  const VERSION = '3.12.0';
+  const VERSION = '3.13.0';
 
   /* ------------------------------------------------------------------ *
    * 1. 共用保護區：所有站台都不動這些地方的文字
@@ -38,6 +38,15 @@
    *    每個站台有自己的字典、樣式規則、以及額外的保護區。
    *    要加新站台，照這個格式再加一組就好。
    * ------------------------------------------------------------------ */
+  /* 星期與上下午的中譯。單獨的日期標籤（Jul 16、July）照既定政策維持英文，
+     這裡只用在「Resets Sun 5:00 PM」「Every Monday at 9:00 AM」這種整句介面文字裡。 */
+  const WEEKDAY_ZH = {
+    Sun: '週日', Mon: '週一', Tue: '週二', Wed: '週三', Thu: '週四', Fri: '週五', Sat: '週六',
+    Sunday: '週日', Monday: '週一', Tuesday: '週二', Wednesday: '週三',
+    Thursday: '週四', Friday: '週五', Saturday: '週六'
+  };
+  const clockZh = (hhmm, ampm) => (/^am$/i.test(ampm) ? '上午 ' : '下午 ') + hhmm;
+
   const SITES = [
     {
       id: 'claude',
@@ -72,7 +81,11 @@
               'Opus', 'Sonnet', 'Haiku', 'Opus 5', 'Opus 4.8', 'Sonnet 5', 'Haiku 4.5',
               'Pro', 'Max', 'MCP', 'API',
               'CDN', 'Chromium', 'GitHub', 'Tampermonkey', 'Ctrl', 'Shift', 'Alt', 'Enter', 'Esc',
-              'Escape', 'Tab', 'Backspace', 'Cmd', 'Option', 'README', 'LICENSE'],
+              'Escape', 'Tab', 'Backspace', 'Cmd', 'Option', 'README', 'LICENSE',
+              /* 作品清單的副檔名標籤，以及交談裡被 DOM 切碎的程式碼片段。
+                 這些是識別碼不是介面文字，翻了反而看不懂。 */
+              'js', 'ts', 'jsx', 'tsx', 'md', 'html', 'css', 'json', 'svg', 'txt', 'csv',
+              'yml', 'yaml', 'sh', 'py', 'commit', 'aria-label', 'outerHTML'],
 
       dict: {
     /* ---- 側邊欄與導覽 ---- */
@@ -704,12 +717,126 @@
     'to this thread': '至此討論串',
     'Get apps and extensions': '取得應用程式與擴充功能',
     'Repository and pull request controls': '儲存庫與合併請求控制項',
-    'Arrow keys move the tile. Perpendicular arrows preview a split; press Enter to commit or Escape to cancel.': '方向鍵可移動磚塊。垂直方向的方向鍵會預覽分割；按 Enter 確認，按 Escape 取消。'
+    'Arrow keys move the tile. Perpendicular arrows preview a split; press Enter to commit or Escape to cancel.': '方向鍵可移動磚塊。垂直方向的方向鍵會預覽分割；按 Enter 確認，按 Escape 取消。',
+
+    /* ---- 表情符號面板（v3.13.0）。shortcode 本身（:smile:）是識別碼，絕對不翻，
+           已在 looksLikeData 過濾掉，連盤點清單都不會再出現。 ---- */
+    'Search emoji': '搜尋表情符號',
+    'Emoji search results': '表情符號搜尋結果',
+    'Smileys & People': '表情與人物',
+    'Animals & Nature': '動物與自然',
+    'Food & Drink': '食物與飲料',
+    'Activity': '活動',
+    'Travel & Places': '旅遊與地點',
+    'Objects': '物品',
+    'Symbols': '符號',
+    'Flags': '旗幟',
+
+    /* ---- 排程任務（v3.13.0）---- */
+    'Scheduled tasks': '排程任務',
+    'Search scheduled tasks': '搜尋排程任務',
+    'No scheduled tasks yet.': '還沒有排程任務。',
+    'New task': '新增任務',
+    'Run tasks on a schedule or whenever you need them.': '依排程執行任務，或在你需要時隨時執行。',
+    'Today\u2019s brief': '今日簡報',
+    "Today's brief": '今日簡報',
+    /* 這六個是官方範本的名稱，配著下面六句說明一起出現。 */
+    'Daily briefing': '每日簡報',
+    'Inbox triage': '收件匣分類',
+    'Weekly review': '每週回顧',
+    'Content ideas': '內容靈感',
+    'Meeting prep': '會議準備',
+    'Monitor a topic': '追蹤主題',
+    'What needs your attention today across calendar, email, and messages.': '今天行事曆、電子郵件與訊息裡需要你注意的事。',
+    'Categorize your inbox and draft replies to anything urgent.': '把收件匣分類，並為緊急的郵件擬好回覆。',
+    'A Friday summary of what happened this week.': '週五彙整這星期發生的事。',
+    'Draft a few post ideas each week from the latest news in your industry.': '每週從你產業的最新消息擬幾則貼文靈感。',
+    'A short brief before each meeting on your calendar, covering attendees, context, and agenda.': '在行事曆上每場會議前給一份簡短摘要，涵蓋與會者、背景與議程。',
+    'Watch for news or mentions of a topic, competitor, or keyword.': '追蹤某個主題、競爭對手或關鍵字的新聞與提及。',
+    'Manual': '手動',
+
+    /* ---- 用量面板（v3.13.0 補齊）---- */
+    'Usage': '用量',
+    'Plan usage limits': '方案用量上限',
+    'See full project usage': '查看完整專案用量',
+    'View usage in Settings': '在設定中查看用量',
+    'Get more usage': '取得更多用量',
+    'Approaching weekly limit': '接近每週上限',
+    'That is your tightest limit right now.': '這是你目前最吃緊的上限。',
+    'Weekly · all models': '每週 · 所有模型',
+    'Resets': '重設時間',
+    'share of project': '佔專案比例',
+    'Context': '上下文',
+    'Context window': '上下文視窗',
+    'This thread': '這條討論串',
+    'This thread compacts automatically as it grows.': '這條討論串會隨著變長自動壓縮。',
+    'Projects compact automatically, carrying over all of your context safely.': '專案會自動壓縮，安全地帶著你所有的上下文。',
+
+    /* ---- 作品頁（v3.13.0 補齊）---- */
+    'Search your artifacts': '搜尋你的作品',
+    'No shared artifacts yet': '還沒有共用的作品',
+    'When someone shares an artifact with you, it appears here.': '有人與你共用作品時會出現在這裡。',
+    'Creates a blank artifact with Claude on the side.': '建立空白作品，旁邊開著 Claude。',
+    'Public': '公開',
+    /* 作品型別的篩選標籤。使用者的作品剛好叫 Document 或 Design 時也會被改到，
+       但篩選列固定是介面，留英文會整排半中半英。要退掉就把這兩條搬到 attrOnly。 */
+    'Document': '文件',
+    'Design': '設計',
+    'Sort projects': '排序專案',
+
+    /* ---- 其他介面（v3.13.0）---- */
+    'Add files, connectors, and more': '新增檔案、連接器等',
+    'New messages': '新訊息',
+    'View thread': '查看討論串',
+    'Cancel edit': '取消編輯',
+    'Editing message': '編輯訊息中',
+    'High priority': '高優先',
+    'Excerpt': '摘錄',
+    'Microphone': '麥克風',
+    'Use voice mode': '使用語音模式',
+    'Use incognito': '使用無痕模式',
+    'just now': '剛剛'
       },
 
       patterns: [
+    /* 分頁標題「<介面字> - Claude」。前半查得到字典才翻；查不到就整串不動，
+       因為那八成是使用者自己的交談或專案名稱。 */
+    [/^(.+) - Claude$/, (m) => {
+      const t = LOOKUP.get(normalize(m[1]));
+      return t ? t + ' - Claude' : null;
+    }],
+
+    /* 用量面板。長的要排在短的前面，patterns 是由上往下比對。 */
+    [/^Resets (Sun|Mon|Tue|Wed|Thu|Fri|Sat) (\d{1,2}:\d{2})\s*(AM|PM) · Compacts automatically$/,
+      (m) => WEEKDAY_ZH[m[1]] + ' ' + clockZh(m[2], m[3]) + ' 重設 · 自動壓縮'],
+    [/^Resets (Sun|Mon|Tue|Wed|Thu|Fri|Sat) (\d{1,2}:\d{2})\s*(AM|PM)$/,
+      (m) => WEEKDAY_ZH[m[1]] + ' ' + clockZh(m[2], m[3]) + ' 重設'],
+    [/^Weekly · all models: (\d+)%$/, (m) => '每週 · 所有模型：' + m[1] + '%'],
+    [/^(\d+)% of Weekly · all models used\.$/, (m) => '已使用每週 · 所有模型的 ' + m[1] + '%。'],
+    [/^(\d+)-hour limit$/, (m) => m[1] + ' 小時上限'],
+
+    /* 排程任務的執行時間 */
+    [/^Every (Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday) at (\d{1,2}:\d{2})\s*(AM|PM)$/,
+      (m) => '每' + WEEKDAY_ZH[m[1]] + ' ' + clockZh(m[2], m[3])],
+    [/^Weekdays at (\d{1,2}:\d{2})\s*(AM|PM)$/, (m) => '平日 ' + clockZh(m[1], m[2])],
+    [/^Every day at (\d{1,2}:\d{2})\s*(AM|PM)$/, (m) => '每天 ' + clockZh(m[1], m[2])],
+    [/^in (\d+) min$/i, (m) => m[1] + ' 分鐘後'],
+    [/^in (\d+) hr$/i, (m) => m[1] + ' 小時後'],
+
+    /* 逗號後面是使用者自己的名字，原樣帶過去 */
+    [/^(Morning|Afternoon|Evening|Night), (.+)$/,
+      (m) => ({ Morning: '早安', Afternoon: '午安', Evening: '晚安', Night: '晚安' })[m[1]] + '，' + m[2]],
+    /* 表情符號名稱維持英文（就是上面那些 shortcode） */
+    [/^Claude reacted with (.+)$/, (m) => 'Claude 用 ' + m[1] + ' 回應'],
+    /* 附件上的移除鈕，括號裡是檔名。只在屬性裡翻，免得改到畫面上的檔名。 */
+    [/^Remove (.+)$/, (m) => '移除 ' + m[1], true],
+
     /* 側邊欄用量的 aria-label。百分比與重設時間會變動，所以用規則；
        時間本身照原樣帶入，不翻（日期時間一律不動）。 */
+    [/^Usage: Weekly · all models: (\d+)%, Resets (Sun|Mon|Tue|Wed|Thu|Fri|Sat) (\d{1,2}:\d{2})\s*(AM|PM), Compacts automatically$/,
+      (m) => '用量：每週 · 所有模型：' + m[1] + '%，' + WEEKDAY_ZH[m[2]] + ' ' + clockZh(m[3], m[4]) +
+             ' 重設，自動壓縮', true],
+    /* 重設時間格式不同時的後備，時間照原樣帶入 */
     [/^Usage: Weekly · all models: (\d+)%, Resets (.+), Compacts automatically$/,
       (m) => '用量：每週 · 所有模型：' + m[1] + '%，' + m[2] + ' 重設，自動壓縮', true],
     [/^(\d+)\s+minutes?\s+ago$/i, (m) => m[1] + ' 分鐘前'],
@@ -1294,6 +1421,17 @@
     // 諺文或假名：不是英文介面，是別的語言的頁尾或內容（例如韓國法人資訊）
     if (/[\uAC00-\uD7AF\u3040-\u30FF]/.test(s)) return true;
 
+    // 表情符號的 shortcode（:smile:、:point_up_2:）。這是識別碼不是介面文字，
+    // 翻了搜尋就壞了。一個 emoji 面板一次就吐出上百條，不濾掉整份清單全是它。
+    if (/^:[a-z0-9_+-]+:$/i.test(s)) return true;
+
+    // 單獨的月份名稱。日期標籤照既定政策維持英文，不必每次都回報。
+    if (/^(January|February|March|April|May|June|July|August|September|October|November|December)$/.test(s)) return true;
+
+    // 星期全名開頭的長日期：Monday, September 21, 2026 at 8:46:55 PM
+    // 下面那條 30 字上限吃不到它。
+    if (/^(Sun|Mon|Tues|Wednes|Thurs|Fri|Satur)day,\s/.test(s)) return true;
+
     // 網址、email
     if (/:\/\//.test(s) || /^www\./i.test(s)) return true;
     if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s)) return true;
@@ -1672,6 +1810,36 @@
   }, true);
 
   /* ------------------------------------------------------------------ *
+   * 6.9 分頁標題
+   *
+   * 標題在 <head> 裡，而 translateSubtree 只走 document.body，所以要單獨翻一次。
+   * claude.ai 換頁不會重新載入，標題是直接改掉的，因此另外盯著 <title>。
+   * 翻譯規則是 patterns 裡的 `^(.+) - Claude$`：前半查得到字典才翻，
+   * 查不到就整串不動——那八成是使用者自己的交談或專案名稱。
+   * ------------------------------------------------------------------ */
+  let lastTitle = '';
+
+  function translateTitle() {
+    if (!enabled) return;
+    const t = document.title;
+    if (!t || t === lastTitle) return;
+    const zh = translateString(t, false);
+    if (zh && zh !== t) {
+      lastTitle = zh;
+      document.title = zh;   // 這行會再觸發一次 observer，但上面那個 === 會擋掉
+    } else {
+      lastTitle = t;
+    }
+  }
+
+  const titleObserver = new MutationObserver(translateTitle);
+
+  function watchTitle() {
+    const el = document.querySelector('title');
+    if (el) titleObserver.observe(el, { childList: true, characterData: true, subtree: true });
+  }
+
+  /* ------------------------------------------------------------------ *
    * 7. 啟動
    * ------------------------------------------------------------------ */
   let started = false;
@@ -1692,6 +1860,8 @@
   function initialPass() {
     if (!enabled) return;
     translateSubtree(document.body || document.documentElement);
+    translateTitle();
+    watchTitle();
   }
 
   start();
