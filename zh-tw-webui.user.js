@@ -2,7 +2,7 @@
 // @name         繁體中文介面（Claude + GitHub）
 // @name:zh-TW   繁體中文介面（Claude + GitHub）
 // @namespace    https://github.com/b010203044-code/zh-tw-webui
-// @version      3.2.0
+// @version      3.3.0
 // @description  把 claude.ai 與 github.com 的「介面文字」換成繁體中文（台灣用語）。只翻譯介面，絕不更動對話內容、程式碼、檔名、議題內文等使用者資料。
 // @author       Harry
 // @match        https://claude.ai/*
@@ -54,7 +54,9 @@
 
       /* 這些泛用單字只在 aria-label / title 等屬性裡翻譯。畫面上的文字節點不碰，
          因為使用者的檔名、資料夾名、討論串名或專案名很可能剛好就叫這些字。 */
-      attrOnly: ['App', 'Other', 'Kind', 'Size', 'Goal', 'Grid', 'Extra', 'Input', 'Output', 'Read', 'Personal', 'Folder', 'Check', 'Environment', 'Developer', 'Organization', 'Models', 'Tokens'],
+      attrOnly: ['App', 'Other', 'Kind', 'Size', 'Goal', 'Grid', 'List', 'Extra', 'Input', 'Output', 'Read',
+                 'Personal', 'Folder', 'Check', 'Environment', 'Developer', 'Organization', 'Models',
+                 'Tokens', 'Project', 'Select', 'Thread'],
 
       dict: {
     /* ---- 側邊欄與導覽 ---- */
@@ -595,7 +597,30 @@
     'Working': '執行中',
     'Working…': '執行中…',
     'Your projects': '你的專案',
-    'Your threads show up here as Claude works.': '當 Claude 執行工作時，你的討論串會顯示在這裡。'
+    'Your threads show up here as Claude works.': '當 Claude 執行工作時，你的討論串會顯示在這裡。',
+
+    /* ---- 泛用標示。單獨的泛用單字都列在上面的 attrOnly，只在屬性裡生效 ---- */
+    '(optional)': '（選填）',
+    'List': '清單',
+    'Project': '專案',
+    'Select': '選取',
+    'Thread': '討論串',
+
+    /* ---- 檔案與圖片 ---- */
+    'Add a Google Drive folder': '新增 Google Drive 資料夾',
+    'Drop in files or folders, or add manually': '拖入檔案或資料夾，或手動新增',
+    'Close image preview': '關閉圖片預覽',
+    'Uploading image': '正在上傳圖片',
+
+    /* ---- 用量與說明連結 ---- */
+    'How do usage and length limits work?': '用量與長度上限如何運作？',
+    'Usage limit best practices': '用量上限最佳做法',
+    'What are projects?': '什麼是專案？',
+
+    /* ---- GitHub App 授權頁（從 claude.ai 導過去，兩邊字典都要有） ---- */
+    'Select at least one repository. Also includes public repositories (read-only).': '請至少選取一個儲存庫，也包含公開儲存庫（唯讀）。',
+    'Read and write access to code, issues, pull requests, workflows': '對程式碼、議題、合併請求與 workflow 的讀寫權限',
+    'Read and write access to actions, checks, code, discussions, issues, pull requests, repository hooks, and workflows': '對 Actions、檢查、程式碼、討論、議題、合併請求、儲存庫 Webhook 與 workflow 的讀寫權限'
       },
 
       patterns: [
@@ -635,7 +660,15 @@
         [/^Up to \$([\d,]+) of initial usage$/i, (m) => '最多 $' + m[1] + ' 的初始用量'],
         /* 第三個元素 true 代表「只在屬性裡套用」——這條太寬鬆，
            畫面上剛好叫「something icon」的檔案不該被改掉。 */
-        [/^(.+) icon$/, (m) => m[1] + ' 圖示', true]
+        [/^(.+) icon$/, (m) => m[1] + ' 圖示', true],
+        /* aria-label 專用：畫面上叫「Actions for 某某」的文字節點不該被動到 */
+        [/^Actions for (.+)$/, (m) => m[1] + ' 的操作', true],
+        [/^Connectors: (.+)$/, (m) => '連接器：' + m[1]],
+        [/^Added (.+) to this thread$/, (m) => '已將 ' + m[1] + ' 加入此討論串'],
+        [/^Daily at (.+)$/, (m) => '每天 ' + m[1]],
+        [/^Sort by: (.+)$/, (m) => '排序：' + (translateString(m[1], true) || m[1])],
+        [/^Good (morning|afternoon|evening), (.+)$/,
+          (m) => ({ morning: '早安', afternoon: '午安', evening: '晚安' })[m[1].toLowerCase()] + '，' + m[2]]
       ]
     },
 
@@ -963,7 +996,7 @@
     'Grant': '授權',
     'Repository access': '儲存庫存取權',
     'All repositories': '所有儲存庫',
-    'Only select repositories': '僅選取的儲存庫',
+    'Only select repositories': '僅限選取的儲存庫',
     'Select repositories': '選擇儲存庫',
     'Permissions': '權限',
     'Read': '讀取',
@@ -1039,7 +1072,10 @@
     'Read access to commit statuses and metadata': '讀取 commit 狀態與中繼資料的權限',
     'Reconnect the Claude GitHub App': '重新連接 Claude GitHub App',
     'The Claude GitHub App needs to be reconnected so Claude can work with your repositories.': '需要重新連接 Claude GitHub App，Claude 才能操作你的儲存庫。',
-    'This applies to all current and future repositories owned by the resource owner. Also includes public repositories (read-only).': '這適用於資源擁有者所擁有的所有現有與未來的儲存庫，也包含公開儲存庫（唯讀）。'
+    'This applies to all current and future repositories owned by the resource owner. Also includes public repositories (read-only).': '這適用於資源擁有者所擁有的所有現有與未來的儲存庫，也包含公開儲存庫（唯讀）。',
+    'Select at least one repository. Also includes public repositories (read-only).': '請至少選取一個儲存庫，也包含公開儲存庫（唯讀）。',
+    'Read and write access to code, issues, pull requests, workflows': '對程式碼、議題、合併請求與 workflow 的讀寫權限',
+    'Read and write access to actions, checks, code, discussions, issues, pull requests, repository hooks, and workflows': '對 Actions、檢查、程式碼、討論、議題、合併請求、儲存庫 Webhook 與 workflow 的讀寫權限'
       },
 
       patterns: [
