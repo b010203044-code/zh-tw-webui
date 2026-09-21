@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         繁體中文介面（Claude + GitHub） v3.8.0
-// @name:zh-TW   繁體中文介面（Claude + GitHub） v3.8.0
+// @name         繁體中文介面（Claude + GitHub） v3.9.0
+// @name:zh-TW   繁體中文介面（Claude + GitHub） v3.9.0
 // @namespace    https://github.com/b010203044-code/zh-tw-webui
-// @version      3.8.0
+// @version      3.9.0
 // @description  把 claude.ai 與 github.com 的「介面文字」換成繁體中文（台灣用語）。只翻譯介面，絕不更動對話內容、程式碼、檔名、議題內文等使用者資料。
 // @author       Harry
 // @match        https://claude.ai/*
@@ -17,9 +17,9 @@
 (function () {
   'use strict';
 
-  /* 版本號。改版時三個地方要一起改：@name、@version、這裡。
+  /* 版本號。改版時四個地方要一起改：@name、@name:zh-TW、@version、這裡。
      @name 帶版本號是為了在油猴控制台與動作選單上一眼看得出跑的是哪一版。 */
-  const VERSION = '3.8.0';
+  const VERSION = '3.9.0';
 
   /* ------------------------------------------------------------------ *
    * 1. 共用保護區：所有站台都不動這些地方的文字
@@ -1234,6 +1234,23 @@
     return s.length > 0 && s.length < 200 && /[A-Za-z]/.test(s) && !/[一-鿿]/.test(s);
   }
 
+  function hasChinese(s) {
+    return /[一-鿿]/.test(s);
+  }
+
+  /* 判斷「這看起來是資料，不是介面文字」。
+     9:55 AM、363.5k、21.3 kB、3m、Jul 11 這些都含有英文字母，
+     光看「有沒有字母」會把它們算成漏翻，那正是雜訊的來源。
+     規則：帶數字而字母很少（單位、AM/PM、月份縮寫），或整串只有一個字母。
+     診斷與背景累積共用同一套判斷，兩邊結果才會一致。 */
+  function looksLikeData(s) {
+    const letters = s.replace(/[^A-Za-z]/g, '');
+    if (letters.length === 0) return true;             // 純數字、日期、符號
+    if (letters.length <= 1) return true;              // 單字元標籤：x、+、v
+    if (/\d/.test(s) && letters.length <= 3) return true; // 9:55 AM、363.5k、Jul 11
+    return false;
+  }
+
   function translateString(raw, isAttr) {
     if (!looksTranslatable(raw)) return null;
     const key = normalize(raw);
@@ -1248,6 +1265,101 @@
     }
     return null;
   }
+
+  /* ------------------------------------------------------------------ *
+   * 3.5 背景累積：把漏翻的字串記在 localStorage，跨頁、跨重開瀏覽器都留著
+   *
+   * 為什麼要這個：Ctrl + Alt + D 只看得到「你按下去那一刻、那一頁 DOM 裡
+   * 真的存在的文字」。沒展開的選單、沒捲到的列表、還沒去過的頁面都抓不到，
+   * 所以每按一次結果都不一樣，也沒辦法確認抓齊了沒。
+   *
+   * 翻譯引擎本來就會在畫面每次變動時走過所有新出現的節點，這裡只是順手把
+   * 「該翻但字典和規則都沒對應」的那些記下來。你正常瀏覽就會累積，不用按鍵，
+   * 之後按 Ctrl + Alt + E 一次倒出來。
+   *
+   * 判斷條件跟 diagnose() 完全一樣：保護區的文字不會進來（走訪時就被剪掉了），
+   * 泛用單字、看起來是資料的、已經有對應條目的也都排除。
+   * 只存在你自己的瀏覽器裡，不會送到任何地方。
+   * ------------------------------------------------------------------ */
+  const COLLECT_KEY = 'zh-tw-webui-collected-' + site.id;
+  const COLLECT_MAX = 3000;   // 上限，避免 localStorage 無限長大
+  const collected = new Set();
+  let collectFull = false;
+
+  try {
+    const saved = JSON.parse(localStorage.getItem(COLLECT_KEY) || '[]');
+    if (Array.isArray(saved)) for (const item of saved) {
+      if (typeof item === 'string') collected.add(item);
+    }
+  } catch (e) { /* 無痕模式、或存檔壞了，就從零開始 */ }
+
+  let saveTimer = null;
+
+  function saveCollected() {
+    saveTimer = null;
+    try {
+      localStorage.setItem(COLLECT_KEY, JSON.stringify(Array.from(collected)));
+    } catch (e) { /* 容量滿或無痕模式，記在記憶體裡就好 */ }
+  }
+
+  function scheduleSave() {
+    if (saveTimer !== null) return;
+    saveTimer = setTimeout(saveCollected, 2000);   // 合併連續變動，不要每個字串都寫一次
+  }
+
+  /* 翻譯流程走到「查不到對應」時呼叫。這裡不再查字典，因為呼叫端已經查過了。 */
+  function recordMiss(raw, isAttr) {
+    if (collectFull || !raw) return;
+    if (!looksTranslatable(raw)) return;          // 太長、純數字、已經是中文
+    const key = normalize(raw);
+    if (!key || collected.has(key)) return;
+    if (looksLikeData(key)) return;
+    if (!isAttr && ATTR_ONLY.has(key)) return;    // 泛用單字，畫面上本來就不翻
+    if (collected.size >= COLLECT_MAX) {
+      collectFull = true;
+      console.warn('[zh-tw-webui] 累積已達上限 ' + COLLECT_MAX + ' 條，先按 Ctrl + Alt + E 匯出。');
+      return;
+    }
+    collected.add(key);
+    scheduleSave();
+  }
+
+  /* Ctrl + Alt + E：把累積到現在的全部倒出來，複製到剪貼簿，然後清空重新累積。
+     清空前一定先印在主控台，萬一剪貼簿失敗還救得回來。 */
+  function exportCollected() {
+    const list = Array.from(collected).sort((a, b) => a.localeCompare(b));
+    const report =
+      '# 累積到現在還沒翻到的介面字串（' + list.length + ' 條，已去重複）\n' +
+      '# 站台：' + site.label + '　版本：v' + VERSION + '　字典：' + LOOKUP.size + ' 條　規則：' + PATTERNS.length + ' 條\n' +
+      '# 範圍：上次匯出之後，你在這個站台瀏覽過的所有畫面\n\n' +
+      list.join('\n');
+
+    console.log('%c[zh-tw-webui v' + VERSION + '] 匯出累積清單：' + list.length + ' 條', 'font-weight:bold');
+    console.log(report);
+
+    if (list.length === 0) {
+      toast('目前沒有累積到漏翻的字串');
+      return { missing: [], count: 0 };
+    }
+
+    collected.clear();
+    collectFull = false;
+    if (saveTimer !== null) { clearTimeout(saveTimer); saveTimer = null; }
+    saveCollected();
+
+    try {
+      navigator.clipboard.writeText(report).then(
+        () => toast('已複製 ' + list.length + ' 條並清空，重新開始累積'),
+        () => toast('匯出 ' + list.length + ' 條，剪貼簿失敗，請從主控台複製')
+      );
+    } catch (e) {
+      toast('匯出 ' + list.length + ' 條，請從主控台複製');
+    }
+    return { missing: list, count: list.length };
+  }
+
+  // 離開頁面前把還沒寫入的存起來，免得剛看到的幾條掉了
+  window.addEventListener('pagehide', () => { if (saveTimer !== null) saveCollected(); });
 
   /* ------------------------------------------------------------------ *
    * 4. DOM 走訪
@@ -1266,7 +1378,7 @@
     if (!parent || isProtected(parent)) return;
 
     const translated = translateString(raw, false);
-    if (!translated) return;
+    if (!translated) { recordMiss(raw, false); return; }
 
     // 保留原本的前後空白，避免破版
     const lead = raw.match(/^\s*/)[0];
@@ -1282,7 +1394,8 @@
       if (!el.hasAttribute(attr)) continue;
       const raw = el.getAttribute(attr);
       const translated = translateString(raw, true);
-      if (translated && translated !== raw) el.setAttribute(attr, translated);
+      if (!translated) { recordMiss(raw, true); continue; }
+      if (translated !== raw) el.setAttribute(attr, translated);
     }
   }
 
@@ -1403,20 +1516,6 @@
       looksLikeData: 0     // 數字、日期、時間、檔案大小、單字元標籤
     };
 
-    const hasChinese = (s) => /[一-鿿]/.test(s);
-
-    /* 判斷「這看起來是資料，不是介面文字」。
-       9:55 AM、363.5k、21.3 kB、3m、Jul 11 這些都含有英文字母，
-       光看「有沒有字母」會把它們算成漏翻，那正是雜訊的來源。
-       規則：帶數字而字母很少（單位、AM/PM、月份縮寫），或整串只有一個字母。 */
-    function looksLikeData(s) {
-      const letters = s.replace(/[^A-Za-z]/g, '');
-      if (letters.length === 0) return true;             // 純數字、日期、符號
-      if (letters.length <= 1) return true;              // 單字元標籤：x、+、v
-      if (/\d/.test(s) && letters.length <= 3) return true; // 9:55 AM、363.5k、Jul 11
-      return false;
-    }
-
     function classify(raw, isAttr, inProtected) {
       if (!raw || !raw.trim()) return;
       if (hasChinese(raw)) { stats.alreadyChinese++; return; }
@@ -1474,8 +1573,16 @@
     return { missing: list, stats: stats };
   }
 
-  // 也掛到 window，方便直接在主控台叫：zhTwWebui.diagnose()
-  try { window.zhTwWebui = { diagnose: diagnose, version: VERSION, site: site.label }; } catch (e) { /* ignore */ }
+  // 也掛到 window，方便直接在主控台叫：zhTwWebui.diagnose() / zhTwWebui.export()
+  try {
+    window.zhTwWebui = {
+      diagnose: diagnose,
+      export: exportCollected,
+      collected: () => collected.size,   // 現在累積了幾條
+      version: VERSION,
+      site: site.label
+    };
+  } catch (e) { /* ignore */ }
 
   function toast(text) {
     const el = document.createElement('div');
@@ -1496,6 +1603,10 @@
     if (e.ctrlKey && e.altKey && (e.key === 'd' || e.key === 'D')) {
       e.preventDefault();
       diagnose();
+    }
+    if (e.ctrlKey && e.altKey && (e.key === 'e' || e.key === 'E')) {
+      e.preventDefault();
+      exportCollected();
     }
   }, true);
 
