@@ -2,7 +2,7 @@
 // @name         繁體中文介面（Claude + GitHub）
 // @name:zh-TW   繁體中文介面（Claude + GitHub）
 // @namespace    https://github.com/b010203044-code/zh-tw-webui
-// @version      3.6.0
+// @version      3.7.0
 // @description  把 claude.ai 與 github.com 的「介面文字」換成繁體中文（台灣用語）。只翻譯介面，絕不更動對話內容、程式碼、檔名、議題內文等使用者資料。
 // @author       Harry
 // @match        https://claude.ai/*
@@ -56,7 +56,8 @@
          因為使用者的檔名、資料夾名、討論串名或專案名很可能剛好就叫這些字。 */
       attrOnly: ['App', 'Other', 'Kind', 'Size', 'Goal', 'Grid', 'List', 'Extra', 'Input', 'Output', 'Read',
                  'Personal', 'Folder', 'Check', 'Environment', 'Developer', 'Organization', 'Models',
-                 'Tokens', 'Project', 'Select', 'Thread', 'Mode', 'Move', 'Prompt', 'High', 'Low'],
+                 'Tokens', 'Project', 'Select', 'Thread', 'Mode', 'Move', 'Prompt', 'High', 'Low',
+                 'All', 'Active', 'Idle', 'Name', 'Type', 'Status'],
 
       dict: {
     /* ---- 側邊欄與導覽 ---- */
@@ -640,6 +641,23 @@
     'Unread response': '未讀回覆',
     'New from a template': '從範本建立',
     'Customize': '自訂',
+
+    /* ---- 專案與討論串列表 ---- */
+    'Sort by': '排序依據',
+    'Group by': '分組依據',
+    'Custom groups': '自訂群組',
+    'Date created': '建立日期',
+    'Last activity': '最後活動',
+    'Routines': '例行任務',
+
+    /* 下面六個是泛用單字，同時列進 attrOnly：只有 aria-label / title 會翻，
+       畫面上剛好叫這幾個字的討論串、專案或檔案不會被動到。 */
+    'All': '全部',
+    'Active': '使用中',
+    'Idle': '閒置',
+    'Name': '名稱',
+    'Type': '類型',
+    'Status': '狀態',
 
     /* ---- 模式與投入程度。High / Low / Mode / Prompt / Move 是泛用字，走 attrOnly ---- */
     'High': '高',
@@ -1441,7 +1459,7 @@
   }
 
   // 也掛到 window，方便直接在主控台叫：zhTwWebui.diagnose()
-  try { window.zhTwWebui = { diagnose: diagnose, version: '3.6.0', site: site.label }; } catch (e) { /* ignore */ }
+  try { window.zhTwWebui = { diagnose: diagnose, version: '3.7.0', site: site.label }; } catch (e) { /* ignore */ }
 
   function toast(text) {
     const el = document.createElement('div');
