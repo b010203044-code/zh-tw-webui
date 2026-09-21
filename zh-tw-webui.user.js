@@ -2,7 +2,7 @@
 // @name         繁體中文介面（Claude + GitHub）
 // @name:zh-TW   繁體中文介面（Claude + GitHub）
 // @namespace    https://github.com/b010203044-code/zh-tw-webui
-// @version      3.3.0
+// @version      3.4.0
 // @description  把 claude.ai 與 github.com 的「介面文字」換成繁體中文（台灣用語）。只翻譯介面，絕不更動對話內容、程式碼、檔名、議題內文等使用者資料。
 // @author       Harry
 // @match        https://claude.ai/*
@@ -1292,10 +1292,121 @@
     }
   }
 
+  /* ------------------------------------------------------------------ *
+   * 6.5 診斷：Ctrl + Alt + D 盤點這一頁還有哪些介面字串沒翻到
+   *
+   * 為什麼需要這個：直接在頁面上抓「所有非中文字串」得到的數字沒有意義，
+   * 而且只會愈滾愈大——你自己打的字、Claude 的回覆、程式碼區塊、貼上來的
+   * 清單全都算在裡面，那些本來就規定不能翻。交談愈長，那個數字愈大，
+   * 跟字典補了多少完全無關。
+   *
+   * 這個診斷只回報「照規則應該翻、但字典和規則都沒對應」的字串，
+   * 其餘分類只給數量，讓那個數字說得出道理。
+   * ------------------------------------------------------------------ */
+  function diagnose() {
+    const missing = new Map();   // 真的漏翻：normalize 後的鍵 -> 字串
+    const stats = {
+      missing: 0,          // 該翻但字典和規則都沒對應 —— 唯一需要你回報的（含重複出現）
+      hasEntry: 0,         // 有對應條目（翻譯開著時幾乎為 0，因為早就變中文了）
+      protectedZone: 0,    // 在保護區裡，規定不能翻
+      attrOnlySkipped: 0,  // 泛用單字，只在屬性裡翻
+      alreadyChinese: 0,   // 已經是中文（多數是翻好的）
+      looksLikeData: 0     // 數字、日期、時間、檔案大小、單字元標籤
+    };
+
+    const hasChinese = (s) => /[一-鿿]/.test(s);
+
+    /* 判斷「這看起來是資料，不是介面文字」。
+       9:55 AM、363.5k、21.3 kB、3m、Jul 11 這些都含有英文字母，
+       光看「有沒有字母」會把它們算成漏翻，那正是雜訊的來源。
+       規則：帶數字而字母很少（單位、AM/PM、月份縮寫），或整串只有一個字母。 */
+    function looksLikeData(s) {
+      const letters = s.replace(/[^A-Za-z]/g, '');
+      if (letters.length === 0) return true;             // 純數字、日期、符號
+      if (letters.length <= 1) return true;              // 單字元標籤：x、+、v
+      if (/\d/.test(s) && letters.length <= 3) return true; // 9:55 AM、363.5k、Jul 11
+      return false;
+    }
+
+    function classify(raw, isAttr, inProtected) {
+      if (!raw || !raw.trim()) return;
+      if (hasChinese(raw)) { stats.alreadyChinese++; return; }
+      if (looksLikeData(raw)) { stats.looksLikeData++; return; }
+      const key = normalize(raw);
+      if (!key) { stats.looksLikeData++; return; }
+      if (!isAttr && inProtected) { stats.protectedZone++; return; }
+      if (!isAttr && ATTR_ONLY.has(key)) { stats.attrOnlySkipped++; return; }
+      if (translateString(raw, isAttr)) { stats.hasEntry++; return; }
+      if (!looksTranslatable(raw)) { stats.looksLikeData++; return; }  // 太長，引擎本來就不看
+      stats.missing++;
+      if (!missing.has(key)) missing.set(key, key);
+    }
+
+    // 文字節點：走整棵樹，但記錄自己在不在保護區裡
+    const rootEl = document.body || document.documentElement;
+    const walker = document.createTreeWalker(rootEl, NodeFilter.SHOW_TEXT, null);
+    let n;
+    while ((n = walker.nextNode())) classify(n.nodeValue, false, isProtected(n.parentElement));
+
+    // 屬性：保護區裡也算，因為 aria-label / title 必定是介面字串
+    for (const attr of ATTRS) {
+      const found = rootEl.querySelectorAll('[' + attr + ']');
+      for (let i = 0; i < found.length; i++) classify(found[i].getAttribute(attr), true, false);
+    }
+
+    const list = Array.from(missing.values()).sort((a, b) => a.localeCompare(b));
+    const report =
+      '# 這一頁還沒翻到的介面字串（' + list.length + ' 條，已去重複）\n' +
+      '# 站台：' + site.label + '　字典：' + LOOKUP.size + ' 條　規則：' + PATTERNS.length + ' 條\n\n' +
+      list.join('\n');
+
+    console.log(
+      '%c[zh-tw-webui] 盤點結果',
+      'font-weight:bold',
+      '\n  還沒翻到（去重複後）：' + list.length + ' 條　← 只有這些需要回報' +
+      '\n  （出現次數：' + stats.missing + ' 處）' +
+      '\n  ──────────────────────' +
+      '\n  保護區，規定不能翻：  ' + stats.protectedZone + ' 處（你的訊息、Claude 回覆、程式碼、檔名…）' +
+      '\n  已經是中文：          ' + stats.alreadyChinese + ' 處' +
+      '\n  看起來是資料：        ' + stats.looksLikeData + ' 處（數字、日期、時間、檔案大小）' +
+      '\n  泛用單字只翻屬性：    ' + stats.attrOnlySkipped + ' 處' +
+      '\n  有對應條目：          ' + stats.hasEntry + ' 處'
+    );
+    console.log(report);
+
+    try {
+      navigator.clipboard.writeText(report).then(
+        () => toast('已複製 ' + list.length + ' 條沒翻到的字串到剪貼簿'),
+        () => toast('盤點完成：' + list.length + ' 條。剪貼簿失敗，請從主控台複製')
+      );
+    } catch (e) {
+      toast('盤點完成：' + list.length + ' 條，請從主控台複製');
+    }
+    return { missing: list, stats: stats };
+  }
+
+  // 也掛到 window，方便直接在主控台叫：zhTwWebui.diagnose()
+  try { window.zhTwWebui = { diagnose: diagnose, version: '3.4.0', site: site.label }; } catch (e) { /* ignore */ }
+
+  function toast(text) {
+    const el = document.createElement('div');
+    el.textContent = text;
+    el.style.cssText =
+      'position:fixed;left:50%;bottom:32px;transform:translateX(-50%);z-index:2147483647;' +
+      'background:#1f1f1f;color:#fff;padding:10px 16px;border-radius:8px;font-size:14px;' +
+      'font-family:system-ui,sans-serif;box-shadow:0 4px 16px rgba(0,0,0,.3);pointer-events:none';
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 4000);
+  }
+
   document.addEventListener('keydown', (e) => {
     if (e.ctrlKey && e.altKey && (e.key === 't' || e.key === 'T')) {
       e.preventDefault();
       toggle();
+    }
+    if (e.ctrlKey && e.altKey && (e.key === 'd' || e.key === 'D')) {
+      e.preventDefault();
+      diagnose();
     }
   }, true);
 
