@@ -1,10 +1,10 @@
 # 繁體中文介面（Claude + GitHub）
 
-腳本檔：`zh-tw-webui.user.js`（v3.8.0）
+腳本檔：`zh-tw-webui.user.js`（v3.18.0）
 安裝連結：[zh-tw-webui.user.js](https://raw.githubusercontent.com/b010203044-code/zh-tw-webui/main/zh-tw-webui.user.js)（Tampermonkey 裝好後點這個連結會直接跳出安裝畫面）
 用途：把 **claude.ai** 和 **github.com** 的介面文字換成繁體中文（台灣用語），不動你的對話內容、程式碼、檔名、議題內文等使用者資料。
 
-字典規模：claude.ai 571 條 + 48 條規則；github.com 360 條 + 30 條規則。
+字典規模：claude.ai 897 條 + 103 條規則；github.com 360 條 + 30 條規則。
 未採用的字串與原因整理在 [未採用字串.md](未採用字串.md)。
 
 > GitHub 網頁介面目前沒有官方的中文選項（使用者社群還在許願階段），所以只能靠腳本翻。claude.ai 也沒有。
@@ -69,6 +69,14 @@ Chrome 系列要多做一步：到 `chrome://extensions`，把右上角的**開�
 | Fork、commit、Actions、Wiki、Gist、Raw、Blame、Clone、Squash、Rebase、Codespaces | 作品（Artifacts）、合併請求（Pull requests）、議題（Issues）、程式碼（Code）、洞察（Insights）、安全性（Security）、儲存庫（Repositories）、分支（Branches）、標籤（Tags） |
 
 > `Artifacts` 原本歸在保留英文那欄，v3.12.0 改譯為「作品」。理由是那一頁裝的是文件、投影片、Design 與 HTML 檔，都是做完可以單獨打開的東西，「作品」涵蓋得到；「文件」已經被 `Docs` 用掉，會撞名。GitHub 的 `Artifacts`（Actions 工作流程的產出檔）是另一回事，維持英文。
+
+> v3.18.0 的取捨：
+> - **技能頁每個技能的說明**（11 句）有翻，和連接器說明同一類：那是 Anthropic 自己填的文案，改一個字條目就失效。
+> - **技能的識別代號**（`algorithmic-art`、`brand-guidelines`、`docs`、`morning`…）一律保留英文，已列進 `never`。它們是代號不是字詞，而且列進去之後 `known()` 認得，`View docs` 才會正確組成「查看 docs」。
+> - **目錄底下的條款句**改成收了。頁面把它切成四段，中文改寫成「提交至目錄須遵守」＋「軟體目錄條款」＋「；使用連接器須遵守你的」＋「相關條款」，動詞全放前半段，拼起來語順才正確。v3.15.0 當時判斷拼不起來，是因為想成「受……規範」那種前後包夾的句型。
+
+> **v3.18.0 修掉一個沉默的 bug：彎撇號。**
+> 撇號有兩種寫法——彎的 `'`（U+2019）和直的 `'`（U+0027）。我從網頁複製字串收進字典時抓到的常是彎的，頁面實際送到腳本手上的卻是直的。整串比對是逐字比的，一個字元不同就整條對不上，所以有 6 個條目**從收進字典那天起就沒作用過**，還會一直出現在你的盤點清單裡。現在 `normalize()` 會把彎引號一律換成直的，兩邊用哪種都對得上。以後自己加翻譯時不必管撇號長什麼樣。
 
 > v3.15.0 的取捨：
 > - 連接器目錄的**分類名稱**（`Engineering`、`Finance`、`Marketing`、`Travel`…）有翻。代價跟 `Document` / `Design` 一樣：你的專案剛好同名時會被改到。要退掉就把那幾行的 key 搬進 `attrOnly`。

@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         繁體中文介面（Claude + GitHub） v3.17.1
-// @name:zh-TW   繁體中文介面（Claude + GitHub） v3.17.1
+// @name         繁體中文介面（Claude + GitHub） v3.18.0
+// @name:zh-TW   繁體中文介面（Claude + GitHub） v3.18.0
 // @namespace    https://github.com/b010203044-code/zh-tw-webui
-// @version      3.17.1
+// @version      3.18.0
 // @description  把 claude.ai 與 github.com 的「介面文字」換成繁體中文（台灣用語）。只翻譯介面，絕不更動對話內容、程式碼、檔名、議題內文等使用者資料。
 // @author       Harry
 // @match        https://claude.ai/*
@@ -19,7 +19,7 @@
 
   /* 版本號。改版時四個地方要一起改：@name、@name:zh-TW、@version、這裡。
      @name 帶版本號是為了在油猴控制台與動作選單上一眼看得出跑的是哪一版。 */
-  const VERSION = '3.17.1';
+  const VERSION = '3.18.0';
 
   /* ------------------------------------------------------------------ *
    * 1. 共用保護區：所有站台都不動這些地方的文字
@@ -106,7 +106,14 @@
               /* 載入動畫的趣味動詞。刻意保留英文，見 未採用字串.md 第一批。 */
               'Forming', 'Kneading', 'Molding', 'Turning over',
               /* Anthropic 的角色組合名，是品牌名不是敘述，保留英文 */
-              'Claude for design', 'Claude for legal', 'Claude for science'],
+              'Claude for design', 'Claude for legal', 'Claude for science',
+              /* 技能與外掛的識別名（skill id）。是代號不是字詞，一律保留英文。
+                 列在這裡也讓 known() 認得，所以「View docs」會變成「查看 docs」。 */
+              'algorithmic-art', 'brand-guidelines', 'canvas-design', 'deep-research',
+              'doc-coauthoring', 'docs', 'import-memory', 'internal-comms', 'mcp-builder',
+              'morning', 'recipe-rainbow-island', 'skill-creator', 'slack-gif-creator',
+              'theme-factory', 'web-artifacts-builder', 'pdf-viewer', 'learn',
+              'Adobe for creativity', 'S&P - Deterministic Retrieval', 'Apollo.io', 'Windsor.ai'],
 
       dict: {
     /* ---- 側邊欄與導覽 ---- */
@@ -907,6 +914,34 @@
     'Social media automation CLI for scheduling posts, managing integrations, uploading media, and tracking analytics across 28+ platforms including X, LinkedIn, Reddit, YouTube, TikTok, Instagram, and more': '社群媒體自動化 CLI，可排程貼文、管理整合、上傳媒體並追蹤成效，涵蓋 X、LinkedIn、Reddit、YouTube、TikTok、Instagram 等 28 種以上平台',
     'Turn website visitor signals into pipeline with Leadfeeder: daily visitor briefs, visitor company research, buyer and contact discovery, personalised outreach drafts, and adding companies to your Leadfeeder lists, via the Leadfeeder connector. Requires a Leadfeeder account.': '用 Leadfeeder 把網站訪客訊號變成業務管線：每日訪客簡報、訪客公司研究、買方與聯絡人探詢、個人化開發信草稿，以及把公司加進你的 Leadfeeder 名單，透過 Leadfeeder 連接器運作。需要 Leadfeeder 帳號。',
     'Work with incident.io from Claude: respond to and investigate incidents, check on-call schedules and escalations, and author the runbooks, skills and architecture docs that incident.io investigations draw on. Bundles the official incident.io MCP server (OAuth on first use).': '在 Claude 裡操作 incident.io：應變與調查事故、查看待命排班與升級狀況，並撰寫 incident.io 調查時會參照的操作手冊、技能與架構文件。內含官方 incident.io MCP 伺服器（首次使用時走 OAuth）。',
+    /* ---- 技能頁與目錄頁（v3.18.0）---- */
+    'by you': '你建立的',
+    'from Anthropic': '來自 Anthropic',
+    'From Anthropic & Partners': '來自 Anthropic 與合作夥伴',
+    'Last edited': '最後編輯',
+    'Turn off': '關閉',
+    'Turn on': '開啟',
+    /* 目錄頁最底下那句條款，頁面把它切成四段：
+       「Submission…the」+「Software Directory Terms」+「; use…your」+「relevant terms」。
+       四段都收，翻完接起來語順才對，見 README 第三節。 */
+    'Submission to the Directory is governed by the': '提交至目錄須遵守',
+    '; use of Connectors is governed by your': '；使用連接器須遵守你的',
+    'relevant terms': '相關條款',
+
+    /* ---- 技能頁上每個技能的說明（v3.18.0）。
+         和連接器說明同一類：Anthropic 自己填的文案，改一個字條目就失效。 ---- */
+    'A set of resources to help me write all kinds of internal communications, using the formats that my company likes to use. Claude should use this skill whenever asked to write some sort of internal communications (status reports, leadership updates, 3P updates, company newsletters, FAQs, incident reports, project updates, etc.).': '一套資源，協助我用公司慣用的格式撰寫各種內部溝通文件。只要有人要求寫內部溝通文件（進度報告、主管更新、3P 更新、公司電子報、常見問答、事故報告、專案更新等），Claude 就該用這個技能。',
+    "Applies Anthropic's official brand colors and typography to any sort of artifact that may benefit from having Anthropic's look-and-feel. Use it when brand colors or style guidelines, visual formatting, or company design standards apply.": '把 Anthropic 的官方品牌色與字體套用到任何適合帶有 Anthropic 風格的作品上。牽涉到品牌色、風格指南、視覺排版或公司設計標準時使用。',
+    "Create beautiful visual art in .png and .pdf documents using design philosophy. You should use this skill when the user asks to create a poster, piece of art, design, or other static piece. Create original visual designs, never copying existing artists' work to avoid copyright violations.": '運用設計理念，在 .png 與 .pdf 文件裡做出好看的視覺作品。使用者要求製作海報、藝術作品、設計或其他靜態作品時使用。一律原創，絕不抄襲既有藝術家的作品，以免侵犯著作權。',
+    "Create new skills, modify and improve existing skills, and measure skill performance. Use when users want to create a skill from scratch, edit, or optimize an existing skill, run evals to test a skill, benchmark skill performance with variance analysis, or optimize a skill's description for better triggering accuracy.": '建立新技能、修改並改進既有技能，以及衡量技能表現。使用者想從頭建立技能、編輯或最佳化既有技能、跑評測、用變異數分析做技能效能基準，或想調整技能說明以提高觸發準確度時使用。',
+    "Creating algorithmic art using p5.js with seeded randomness and interactive parameter exploration. Use this when users request creating art using code, generative art, algorithmic art, flow fields, or particle systems. Create original algorithmic art rather than copying existing artists' work to avoid copyright violations.": '用 p5.js 搭配種子亂數與互動式參數探索來創作演算法藝術。使用者要求用程式碼創作、生成式藝術、演算法藝術、流場或粒子系統時使用。一律原創，不抄襲既有藝術家的作品，以免侵犯著作權。',
+    'Guide for creating high-quality MCP (Model Context Protocol) servers that enable LLMs to interact with external services through well-designed tools. Use when building MCP servers to integrate external APIs or services, whether in Python (FastMCP) or Node/TypeScript (MCP SDK).': '教你做出高品質的 MCP（Model Context Protocol）伺服器，用設計良好的工具讓大型語言模型能操作外部服務。要建 MCP 伺服器去串接外部 API 或服務時使用，Python（FastMCP）與 Node／TypeScript（MCP SDK）皆可。',
+    "Import a memory export from another AI assistant into Claude's memory — conversationally, additively, and with the content treated as data.": '把其他 AI 助理匯出的記憶匯入 Claude 的記憶——以對話方式進行、只會新增不會覆蓋，而且內容一律當成資料看待。',
+    'Knowledge and utilities for creating animated GIFs optimized for Slack. Provides constraints, validation tools, and animation concepts. Use when users request animated GIFs for Slack like "make me a GIF of X doing Y for Slack."': '製作 Slack 專用動態 GIF 的知識與工具，提供限制條件、驗證工具與動畫概念。使用者要求做 Slack 用的動態 GIF（例如「幫我做一個 X 在做 Y 的 GIF 放 Slack」）時使用。',
+    "Render the user's morning brief as a styled HTML artifact, or set it up as a recurring weekday task. Use only when the user explicitly asks to run, see, or set up their morning brief, or if they invoke /morning by name. A question about their day, schedule, or calendar is not by itself a request for the brief; answer it directly instead.": '把使用者的晨間簡報做成有樣式的 HTML 作品，或設成平日固定執行的排程。只有在使用者明確要求執行、查看或設定晨間簡報，或直接叫出 /morning 時才使用。單純問今天行程或行事曆並不等於要簡報，那種就直接回答。',
+    'Suite of tools for creating elaborate, multi-component claude.ai HTML artifacts using modern frontend web technologies (React, Tailwind CSS, shadcn/ui). Use for complex artifacts requiring state management, routing, or shadcn/ui components - not for simple single-file HTML/JSX artifacts.': '一整套工具，用現代前端技術（React、Tailwind CSS、shadcn/ui）製作結構複雜、多元件的 claude.ai HTML 作品。適合需要狀態管理、路由或 shadcn/ui 元件的複雜作品，單檔的簡單 HTML／JSX 作品不需要用。',
+    'Toolkit for styling artifacts with a theme. These artifacts can be slides, docs, reportings, HTML landing pages, etc. There are 10 pre-set themes with colors/fonts that you can apply to any artifact that has been creating, or can generate a new theme on-the-fly.': '替作品套用主題樣式的工具組。作品可以是投影片、文件、報表、HTML 到達頁等等。內建 10 組配好顏色與字體的主題，可套用到任何已建立的作品，也可以臨時生成新主題。',
+
     /* ---- 連接器與外掛的說明文案（v3.16.0，Harry 指定要翻）。
          這是各家廠商自己填的簡介，他們改一個字條目就失效。只收目錄上實際看過的。 ---- */
     'Accelerate design workflows — critique, design system management, UX writing, accessibility audits, research synthesis, and dev handoff. From exploration to pixel-perfect specs.': '加速設計流程——設計評論、設計系統管理、UX 文案、無障礙稽核、研究整合與交付開發。從發想到精準到像素的規格。',
@@ -1129,11 +1164,21 @@
     [/^View (.+)$/, (m) => { const t = known(m[1]); return t ? joinZh('查看', t) : null; }],
     [/^Show (.+)$/, (m) => { const t = known(m[1]); return t ? joinZh('顯示', t) : null; }],
     [/^Remove (.+)$/, (m) => { const t = known(m[1]); return t ? joinZh('移除', t) : null; }],
+    [/^Turn off (.+)$/, (m) => { const t = known(m[1]); return t ? joinZh('關閉', t) : null; }],
+    [/^Turn on (.+)$/, (m) => { const t = known(m[1]); return t ? joinZh('開啟', t) : null; }],
+
+    /* 技能與外掛卡片右上角的「⋯」鈕（v3.18.0）。後面是技能代號，不翻。 */
+    [/^More actions for (.+)$/, (m) => { const t = known(m[1]); return t ? t + ' 的更多操作' : null; }],
+
+    /* 排序鈕。後面的欄位名查得到字典才翻。 */
+    [/^Sort by (.+)$/, (m) => { const t = known(m[1]); return t ? '排序依據：' + t : null; }],
 
     /* 總覽的討論串計數 */
     [/^(\d+) still open$/, (m) => m[1] + ' 條仍未結'],
     [/^(\d+) completed$/, (m) => m[1] + ' 條已完成'],
     [/^(\d+) needs? attention$/, (m) => m[1] + ' 條需要處理'],
+    /* 同一句被 DOM 切成兩段時，逗號會留在後半段開頭（v3.18.0）。 */
+    [/^, (\d+) needs? attention$/, (m) => '，' + m[1] + ' 條需要處理'],
 
     /* 附件上的移除鈕，括號裡是檔名。只在屬性裡翻，免得改到畫面上的檔名。
        排在上面那條查表版後面，查不到字典時才輪到它。 */
@@ -1727,6 +1772,11 @@
       .replace(/ /g, ' ')
       .replace(/…/g, '…')
       .replace(/\.\.\./g, '…')
+      /* 彎引號統一成直的（v3.18.0）。同一句話在不同地方可能用不同的撇號，
+         字典收了彎的、頁面上是直的就永遠對不上——v3.16.0 收的四句連接器說明
+         就是這樣整整一版都沒生效。 */
+      .replace(/[\u2018\u2019]/g, "'")
+      .replace(/[\u201C\u201D]/g, '"')
       .replace(/\s+/g, ' ')
       .trim();
   }
