@@ -197,6 +197,12 @@ attrOnly: ['App', 'Other', 'Kind', 'Size', 'Goal', 'Grid', 'List', 'Extra', 'Inp
 `Ctrl + Alt + D` 呼叫 `diagnose()`，也可以在主控台直接叫 `zhTwWebui.diagnose()`。
 它用的是腳本自己那一套規則，所以回報出來的東西才是真的該補的。詳見〈九〉。
 
+> **v3.14.1 修正**：`diagnose()` 以前拿沒正規化的原字串去跑 `looksLikeData()`。
+> 頁面上的文字節點常帶著前後換行與縮排，`:smile:\n` 過不了 shortcode 那條規則、
+> `README.md ` 過不了「整串沒有空白」那條，於是整批資料型字串都漏進清單。
+> `Ctrl + Alt + E` 那邊（`recordMiss()`）本來就是先 `normalize()` 再比對，
+> 所以兩個鍵的結果一直對不起來。現在兩邊一致了。
+
 `Ctrl + Alt + E` 呼叫 `exportCollected()`（主控台是 `zhTwWebui.export()`），倒出背景累積的全部。
 `zhTwWebui.collected()` 可以隨時看現在累積了幾條。
 

@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         繁體中文介面（Claude + GitHub） v3.14.0
-// @name:zh-TW   繁體中文介面（Claude + GitHub） v3.14.0
+// @name         繁體中文介面（Claude + GitHub） v3.14.1
+// @name:zh-TW   繁體中文介面（Claude + GitHub） v3.14.1
 // @namespace    https://github.com/b010203044-code/zh-tw-webui
-// @version      3.14.0
+// @version      3.14.1
 // @description  把 claude.ai 與 github.com 的「介面文字」換成繁體中文（台灣用語）。只翻譯介面，絕不更動對話內容、程式碼、檔名、議題內文等使用者資料。
 // @author       Harry
 // @match        https://claude.ai/*
@@ -19,7 +19,7 @@
 
   /* 版本號。改版時四個地方要一起改：@name、@name:zh-TW、@version、這裡。
      @name 帶版本號是為了在油猴控制台與動作選單上一眼看得出跑的是哪一版。 */
-  const VERSION = '3.14.0';
+  const VERSION = '3.14.1';
 
   /* ------------------------------------------------------------------ *
    * 1. 共用保護區：所有站台都不動這些地方的文字
@@ -1720,9 +1720,14 @@
     function classify(raw, isAttr, inProtected) {
       if (!raw || !raw.trim()) return;
       if (hasChinese(raw)) { stats.alreadyChinese++; return; }
-      if (looksLikeData(raw)) { stats.looksLikeData++; return; }
+      /* v3.14.1 修正：以前這裡是 looksLikeData(raw)，拿沒正規化的原字串去比對。
+         文字節點常帶著前後換行與縮排，`:smile:\n` 過不了 /^:[a-z0-9_+-]+:$/，
+         `README.md ` 也過不了「整串沒有空白」那條，於是整批資料型字串都漏進清單。
+         recordMiss()（Ctrl + Alt + E）本來就是用 key 比對，所以兩個鍵結果會對不起來。
+         先 normalize 再判斷，兩邊就一致了。 */
       const key = normalize(raw);
       if (!key) { stats.looksLikeData++; return; }
+      if (looksLikeData(key)) { stats.looksLikeData++; return; }
       if (!isAttr && inProtected) { stats.protectedZone++; return; }
       if (!isAttr && ATTR_ONLY.has(key)) { stats.attrOnlySkipped++; return; }
       if (NEVER.has(key)) { stats.deliberate++; return; }
