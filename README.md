@@ -228,7 +228,14 @@ attrOnly: ['App', 'Other', 'Kind', 'Size', 'Goal', 'Grid', 'List', 'Extra', 'Inp
 > 所以兩個鍵的結果一直對不起來。現在兩邊一致了。
 
 `Ctrl + Alt + E` 呼叫 `exportCollected()`（主控台是 `zhTwWebui.export()`），倒出背景累積的全部。
-`zhTwWebui.collected()` 可以隨時看現在累積了幾條。
+`zhTwWebui.collected()` 可以隨時看現在累積了幾條，`zhTwWebui.clear()` 只清空不匯出。
+
+> **「按了 E 卻好像沒清空」**：它有清空（清完立刻寫回 `localStorage`），
+> 但**清空之後只要畫面重繪，眼前這一頁上還沒翻到的字串會馬上再被記進來**。
+> 所以在同一頁連按兩次 E，第二次拿到的東西會跟第一次很像——那不是沒清掉，
+> 是這一頁本來就有那些字。尤其你把上一份清單貼進交談後，清單本身就是頁面內容。
+> 想確認清空成功，按完 E 立刻在主控台看 `zhTwWebui.collected()`。
+> **要看單一頁面還缺什麼，請用 `Ctrl + Alt + D`**；`E` 是給「逛過好幾頁之後一次收齊」用的。
 
 ### 第 6.9 段：分頁標題（搜尋 `* 6.9`，v3.13.0 新增）
 

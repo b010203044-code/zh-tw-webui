@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         繁體中文介面（Claude + GitHub） v3.17.0
-// @name:zh-TW   繁體中文介面（Claude + GitHub） v3.17.0
+// @name         繁體中文介面（Claude + GitHub） v3.17.1
+// @name:zh-TW   繁體中文介面（Claude + GitHub） v3.17.1
 // @namespace    https://github.com/b010203044-code/zh-tw-webui
-// @version      3.17.0
+// @version      3.17.1
 // @description  把 claude.ai 與 github.com 的「介面文字」換成繁體中文（台灣用語）。只翻譯介面，絕不更動對話內容、程式碼、檔名、議題內文等使用者資料。
 // @author       Harry
 // @match        https://claude.ai/*
@@ -19,7 +19,7 @@
 
   /* 版本號。改版時四個地方要一起改：@name、@name:zh-TW、@version、這裡。
      @name 帶版本號是為了在油猴控制台與動作選單上一眼看得出跑的是哪一版。 */
-  const VERSION = '3.17.0';
+  const VERSION = '3.17.1';
 
   /* ------------------------------------------------------------------ *
    * 1. 共用保護區：所有站台都不動這些地方的文字
@@ -1949,6 +1949,20 @@
     return { missing: list, count: list.length };
   }
 
+  /* 只清空、不匯出。給「我要從乾淨的狀態重新逛」用的。
+     注意：清空之後只要畫面重繪，這一頁上還沒翻到的字串會立刻再被記進來——
+     那不是沒清掉，是這一頁本來就有那些字。要看單一頁面請用 Ctrl + Alt + D。 */
+  function clearCollected() {
+    const n = collected.size;
+    collected.clear();
+    collectFull = false;
+    if (saveTimer !== null) { clearTimeout(saveTimer); saveTimer = null; }
+    saveCollected();
+    console.log('[zh-tw-webui v' + VERSION + '] 已清空累積清單（原本 ' + n + ' 條）。');
+    toast('已清空累積清單（原本 ' + n + ' 條）');
+    return n;
+  }
+
   // 離開頁面前把還沒寫入的存起來，免得剛看到的幾條掉了
   window.addEventListener('pagehide', () => { if (saveTimer !== null) saveCollected(); });
 
@@ -2177,6 +2191,7 @@
     window.zhTwWebui = {
       diagnose: diagnose,
       export: exportCollected,
+      clear: clearCollected,             // 只清空不匯出
       collected: () => collected.size,   // 現在累積了幾條
       version: VERSION,
       site: site.label
