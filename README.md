@@ -1,6 +1,6 @@
 # 繁體中文介面（Claude + GitHub）
 
-腳本檔：`zh-tw-webui.user.js`（v3.20.0）
+腳本檔：`zh-tw-webui.user.js`（v3.21.0）
 安裝連結：[zh-tw-webui.user.js](https://raw.githubusercontent.com/b010203044-code/zh-tw-webui/main/zh-tw-webui.user.js)（Tampermonkey 裝好後點這個連結會直接跳出安裝畫面）
 用途：把 **claude.ai** 和 **github.com** 的介面文字換成繁體中文（台灣用語），不動你的對話內容、程式碼、檔名、議題內文等使用者資料。
 
@@ -60,6 +60,7 @@ Chrome 系列要多做一步：到 `chrome://extensions`，把右上角的**開�
 - **不會被翻譯的地方**（刻意設計）：
   - claude.ai：你的訊息、Claude 的回應、程式碼區塊、輸入框、Artifact 內容
   - claude.ai 專案（v3.20.0 補上）：時間軸的訊息內容、討論串卡片的摘要、產出檔名、左下角你的名字
+  - claude.ai 側邊欄（v3.21.0 補上）：「最近」底下的交談與專案名稱。上面的導覽列（新的對話、專案、作品…）不受影響，仍然會翻
   - github.com：程式碼與 diff、議題與留言內文、檔名與路徑、分支名、commit 訊息、儲存庫名稱與說明、使用者名稱、標籤名稱
 
 ---
@@ -458,6 +459,7 @@ v3.8.0 起 `@name` 後面帶了版本號，所以**每次改版腳本名稱都�
 | 症狀 | 可能原因與處理 |
 |---|---|
 | 完全沒翻譯 | Chrome 沒開開發人員模式；或 Tampermonkey 圖示沒顯示 `1`；或網址不在 `@match` 範圍內 |
+| 主控台貼不上去 | Chrome／Edge 的自我保護。照提示在主控台打 `allow pasting` 再按 Enter，之後就能正常貼了（只要做一次） |
 | 只翻了一部分 | 該字串不在字典裡，或整段字串有細微差異（多空格、`...` vs `…`） |
 | GitHub 上某些字沒翻 | 多半是被 `protect` 清單蓋到了。這是刻意保守，寧可少翻也不要改到使用者資料 |
 | 翻譯閃一下又變回英文 | 框架重繪蓋掉了。正常情況 `MutationObserver` 會再翻回來；持續發生就回報該字串 |

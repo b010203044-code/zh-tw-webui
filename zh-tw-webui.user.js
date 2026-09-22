@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         繁體中文介面（Claude + GitHub） v3.20.0
-// @name:zh-TW   繁體中文介面（Claude + GitHub） v3.20.0
+// @name         繁體中文介面（Claude + GitHub） v3.21.0
+// @name:zh-TW   繁體中文介面（Claude + GitHub） v3.21.0
 // @namespace    https://github.com/b010203044-code/zh-tw-webui
-// @version      3.20.0
+// @version      3.21.0
 // @description  把 claude.ai 與 github.com 的「介面文字」換成繁體中文（台灣用語）。只翻譯介面，絕不更動對話內容、程式碼、檔名、議題內文等使用者資料。
 // @author       Harry
 // @match        https://claude.ai/*
@@ -19,7 +19,7 @@
 
   /* 版本號。改版時四個地方要一起改：@name、@name:zh-TW、@version、這裡。
      @name 帶版本號是為了在油猴控制台與動作選單上一眼看得出跑的是哪一版。 */
-  const VERSION = '3.20.0';
+  const VERSION = '3.21.0';
 
   /* ------------------------------------------------------------------ *
    * 1. 共用保護區：所有站台都不動這些地方的文字
@@ -70,7 +70,14 @@
         '.cds-user-message-body',                          // 時間軸上的訊息內容
         '[data-testid="channel-created-thread-summary"]',  // 討論串卡片的摘要那一行
         '[data-testid="root-output-attachment"]',          // 卡片上的產出檔名
-        '[data-testid="user-menu-button"]'                 // 左下角你自己的名字
+        '[data-testid="user-menu-button"]',                // 左下角你自己的名字
+        /* 側邊欄「最近」的交談與專案名稱（v3.21.0）。
+           導覽列（新的對話／專案／作品…）跟它用同一種 [data-row] 列結構，
+           不能整個保護，否則導覽列會變回英文。兩者的差別有兩個，這裡兩個都要求：
+           1. 導覽列的按鈕帶 data-nav-item="projects" 這種標記，「最近」沒有；
+           2. 「最近」的文字包在 span[data-row-label] 裡，導覽列的沒有這層。
+           路徑同樣是 Ctrl + Alt + W 與 zhTwWebui.where('專案') 回報的。 */
+        '[data-row-main-button]:not([data-nav-item]) [data-row-label]'
       ],
 
       /* 這些泛用單字只在 aria-label / title 等屬性裡翻譯。畫面上的文字節點不碰，
