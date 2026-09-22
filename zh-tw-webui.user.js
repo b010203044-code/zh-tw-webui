@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         繁體中文介面（Claude + GitHub） v3.21.0
-// @name:zh-TW   繁體中文介面（Claude + GitHub） v3.21.0
+// @name         繁體中文介面（Claude + GitHub） v3.22.0
+// @name:zh-TW   繁體中文介面（Claude + GitHub） v3.22.0
 // @namespace    https://github.com/b010203044-code/zh-tw-webui
-// @version      3.21.0
+// @version      3.22.0
 // @description  把 claude.ai 與 github.com 的「介面文字」換成繁體中文（台灣用語）。只翻譯介面，絕不更動對話內容、程式碼、檔名、議題內文等使用者資料。
 // @author       Harry
 // @match        https://claude.ai/*
@@ -19,7 +19,7 @@
 
   /* 版本號。改版時四個地方要一起改：@name、@name:zh-TW、@version、這裡。
      @name 帶版本號是為了在油猴控制台與動作選單上一眼看得出跑的是哪一版。 */
-  const VERSION = '3.21.0';
+  const VERSION = '3.22.0';
 
   /* ------------------------------------------------------------------ *
    * 1. 共用保護區：所有站台都不動這些地方的文字
@@ -121,6 +121,7 @@
               'Strava', 'Stripe', 'Supabase', 'Vanguard Advisor Tools', 'Vercel',
               'Vibe Prospecting', 'vidIQ', 'Windsor.ai', 'Wingspan', 'Zapier', 'ZoomInfo',
               'Sonnet 4.6', 'Opus 4.6', 'Claude Code', 'Cowork',
+              'Fable', 'Fable 5.1', 'Opus 5.5',
               /* 載入動畫的趣味動詞。刻意保留英文，見 未採用字串.md 第一批。 */
               'Forming', 'Kneading', 'Molding', 'Turning over',
               /* Anthropic 的角色組合名，是品牌名不是敘述，保留英文 */
@@ -254,6 +255,30 @@
     'Fastest model for daily tasks': '日常任務最快的模型',
     'Fastest model': '最快的模型',
     'Powerful model for complex challenges': '處理複雜任務的強大模型',
+    'Auto': '自動',
+    'Fastest for quick answers': '快速回答最快',
+    'Most efficient for everyday tasks': '日常任務最有效率',
+    'For complex tasks': '適合複雜任務',
+    'For your toughest challenges': '應付最艱難的挑戰',
+    'Set as default': '設為預設',
+    'Requires usage credits': '需要用量點數',
+    'Buy credits': '購買點數',
+    'Fable 5.1 is included in Max plans, or available with usage credits on Pro.': 'Fable 5.1 已包含在 Max 方案中，Pro 方案則可用用量點數使用。',
+
+    /* ---- 權限模式（v3.22.0） ---- */
+    'Permission mode': '權限模式',
+    'Claude asks before using new tools or opening new sites.': 'Claude 使用新工具或開啟新網站前會先詢問。',
+    'Claude runs on its own and pauses to ask if anything looks unsafe.': 'Claude 會自行執行，遇到看起來不安全的情況才暫停詢問。',
+
+    /* ---- 意見回饋與裝置（v3.22.0） ---- */
+    'Send feedback': '傳送意見回饋',
+    'Open a session to send feedback.': '開啟一個工作階段才能傳送意見回饋。',
+    'No devices found': '找不到裝置',
+
+    /* ---- 其他介面（v3.22.0） ---- */
+    'Filter and sort': '篩選與排序',
+    'Let Claude pick the format': '讓 Claude 決定格式',
+    'Type / for skills': '輸入 / 叫出技能',
 
     /* ---- 訊息操作 ---- */
     'Copy': '複製',
@@ -1177,6 +1202,12 @@
     /* 活動面板的「Reading <檔名>」。限定副檔名，免得把「Reading list」這種名字改掉。 */
     [/^Reading (.+\.(?:md|txt|json|js|ts|html|css|csv|png|jpe?g|gif|svg|pdf))$/i, (m) => '讀取 ' + m[1] + ' 中'],
 
+    /* 首頁問候語（v3.22.0）。後面接的是使用者自己的名字，原樣帶過去。
+       限定已知的問候開頭，免得把一般句子當成問候語改掉。 */
+    [/^Up late, ([^?]{1,40})\?$/, (m) => '還沒睡嗎，' + m[1] + '？'],
+    [/^(Good morning|Good afternoon|Good evening), (.{1,40})$/,
+      (m) => { const t = known(m[1]); return t ? t + '，' + m[2] : null; }],
+
     /* 用量的 5 小時上限 */
     [/^(\d+)% of 5-hour limit used\.$/, (m) => '已使用 5 小時上限的 ' + m[1] + '%。'],
     [/^Usage: (\d+)% of 5-hour limit, Compacts automatically$/,
@@ -1847,6 +1878,9 @@
 
     // 逗號分隔的檔名清單：1789418499461_image.png, IMG_7981.jpeg
     if (/^\S+\.[A-Za-z0-9]{2,5}(?:,\s*\S+\.[A-Za-z0-9]{2,5})+$/.test(s)) return true;
+
+    // 版本號開頭的字串：v3.11.0 commit、v1.2 draft。那是使用者自己的紀錄不是介面文字。
+    if (/^v\d+(\.\d+)+\b/.test(s)) return true;
 
     // 網址、email
     if (/:\/\//.test(s) || /^www\./i.test(s)) return true;
