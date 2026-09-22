@@ -73,7 +73,7 @@ Chrome 系列要多做一步：到 `chrome://extensions`，把右上角的**開�
 > v3.15.0 的取捨：
 > - 連接器目錄的**分類名稱**（`Engineering`、`Finance`、`Marketing`、`Travel`…）有翻。代價跟 `Document` / `Design` 一樣：你的專案剛好同名時會被改到。要退掉就把那幾行的 key 搬進 `attrOnly`。
 > - 連接器與外掛的**產品名**（`Asana`、`Figma`、`Notion`…約 60 個）一律保留英文，已列進 `never`，不會再出現在盤點清單。
-> - 連接器的**說明文案**（`Search, create, autofill, and export Canva designs` 這種）**不翻**。那是第三方廠商自己寫的，數量沒有上限、隨時會改，收進字典只會愈積愈多。
+> - 連接器的**說明文案**（`Search, create, autofill, and export Canva designs` 這種）v3.16.0 起有翻，收了目錄上實際看過的 65 句。那是第三方廠商自己寫的，廠商改文案就會變回英文，逛到沒收過的連接器也一樣——這是說好的取捨。
 > - `Date`、`State`、`Medium`、`None`、`Updated` 收進字典但同時列進 `attrOnly`，跟 `Name`、`Type`、`Status` 同一類：畫面上維持英文，只有 `aria-label` 會翻。
 
 > v3.13.0 的幾個取捨：

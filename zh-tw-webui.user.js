@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         繁體中文介面（Claude + GitHub） v3.15.0
-// @name:zh-TW   繁體中文介面（Claude + GitHub） v3.15.0
+// @name         繁體中文介面（Claude + GitHub） v3.16.0
+// @name:zh-TW   繁體中文介面（Claude + GitHub） v3.16.0
 // @namespace    https://github.com/b010203044-code/zh-tw-webui
-// @version      3.15.0
+// @version      3.16.0
 // @description  把 claude.ai 與 github.com 的「介面文字」換成繁體中文（台灣用語）。只翻譯介面，絕不更動對話內容、程式碼、檔名、議題內文等使用者資料。
 // @author       Harry
 // @match        https://claude.ai/*
@@ -19,7 +19,7 @@
 
   /* 版本號。改版時四個地方要一起改：@name、@name:zh-TW、@version、這裡。
      @name 帶版本號是為了在油猴控制台與動作選單上一眼看得出跑的是哪一版。 */
-  const VERSION = '3.15.0';
+  const VERSION = '3.16.0';
 
   /* ------------------------------------------------------------------ *
    * 1. 共用保護區：所有站台都不動這些地方的文字
@@ -870,6 +870,74 @@
     'Give Claude role-level expertise with plugins. Add them from Discover, or create your own.': '用外掛讓 Claude 具備特定角色的專業能力。可以從「探索」加入，也可以自己做一個。',
     'Add a Git repository of plugins. Marketplaces you add here are personal. Enabled plugins load in your own threads in this and every project.': '加入一個放著外掛的 Git 儲存庫。在這裡加入的市集屬於你個人。啟用的外掛會載入你在本專案以及所有專案的討論串。',
 
+
+    /* ---- 連接器與外掛的說明文案（v3.16.0，Harry 指定要翻）。
+         這是各家廠商自己填的簡介，他們改一個字條目就失效。只收目錄上實際看過的。 ---- */
+    'Accelerate design workflows — critique, design system management, UX writing, accessibility audits, research synthesis, and dev handoff. From exploration to pixel-perfect specs.': '加速設計流程——設計評論、設計系統管理、UX 文案、無障礙稽核、研究整合與交付開發。從發想到精準到像素的規格。',
+    'Access and create new content on Miro boards': '在 Miro 白板上讀取與建立內容',
+    'Access ICD-10-CM and ICD-10-PCS code sets': '查詢 ICD-10-CM 與 ICD-10-PCS 代碼集',
+    'Access the CMS Coverage Database': '查詢 CMS 給付資料庫',
+    'Access US National Provider Identifier (NPI) Registry': '查詢美國全國醫療提供者識別碼（NPI）登錄庫',
+    'Access Vanguard models data and content from Claude': '在 Claude 裡取用 Vanguard 的模型資料與內容',
+    'Access your company’s SharePoint, OneDrive, Outlook, and Teams directly in Claude': '在 Claude 裡直接存取公司的 SharePoint、OneDrive、Outlook 與 Teams',
+    'Analyze, debug, and manage projects and deployments': '分析、除錯並管理專案與部署',
+    'Analyze, summarize, and explore your Strava data': '分析、摘要並探索你的 Strava 資料',
+    'Automate workflows across thousands of apps via conversation': '用對話把上千種應用程式的工作流程自動化',
+    'Build animated slides and motion graphics with HTML': '用 HTML 做動畫投影片與動態圖像',
+    'Build, analyze, and compare portfolios for advisors': '為理財顧問建立、分析並比較投資組合',
+    'Build, manage, and analyze your Shopify store': '建立、管理並分析你的 Shopify 商店',
+    'Business Finances made simple': '把企業財務變簡單',
+    'Client, portfolio, and performance data for advisors': '給理財顧問的客戶、投資組合與績效資料',
+    'Connect Meta Ads, Google Ads, TikTok Ads, LinkedIn Ads + 320 more': '連接 Meta Ads、Google Ads、TikTok Ads、LinkedIn Ads 等 320 種以上服務',
+    'Connect to Asana to coordinate tasks, projects, and goals': '連接 Asana，統整任務、專案與目標',
+    'Connect your Notion workspace to search, update, and power workflows across tools': '連接你的 Notion 工作區，跨工具搜尋、更新並驅動工作流程',
+    'Control your Sonos system': '控制你的 Sonos 音響系統',
+    'Create content, plan campaigns, and analyze performance across marketing channels. Maintain brand voice consistency, track competitors, and report on what’s working.': '跨行銷管道製作內容、規劃活動並分析成效。維持品牌口吻一致、追蹤競爭對手，並回報哪些做法有效。',
+    'Create presentations, docs, socials, and sites with AI': '用 AI 製作簡報、文件、社群貼文與網站',
+    'Create, customize, and manage plugins tailored to your organization’s tools and workflows. Configure MCP servers, adjust plugin behavior, and adapt templates to match how your team works.': '依照組織的工具與流程建立、自訂並管理外掛。設定 MCP 伺服器、調整外掛行為，並把範本改成符合團隊的做法。',
+    'CRM context for every answer, insight, and action': '每一則回答、洞察與行動都帶著 CRM 脈絡',
+    'Debug and resolve issues using Datadog telemetry': '用 Datadog 的遙測資料除錯並解決問題',
+    'Deterministic access to S&P Global data': '以確定性的方式取用 S&P Global 資料',
+    'Discover how to get anywhere': '找出去任何地方的方法',
+    'Draft replies, summarize threads, & search your inbox': '擬回覆、摘要郵件串，並搜尋收件匣',
+    'Draft, review, and research with the tools legal teams use.': '用法務團隊慣用的工具擬稿、審閱與研究。',
+    'Find and enrich company and contact data in Claude for prospecting, lead generation, recruiting, and CRM enrichment across 150M+ companies and 800M+ contacts': '在 Claude 裡從 1.5 億家以上公司與 8 億筆以上聯絡人中尋找並補全公司與聯絡人資料，用於開發客戶、名單開發、招募與 CRM 補全',
+    'Find prospects. Research accounts. Enrich buyers with verified B2B data. Act on intent signals.': '找出潛在客戶、研究客戶名單、用經過驗證的 B2B 資料補全買方輪廓，並依購買意向訊號採取行動。',
+    'Find your next hike': '找到你的下一條步道',
+    'Find, enrich, and reach ideal prospects, on Claude': '在 Claude 裡尋找、補全並接觸理想的潛在客戶',
+    'Generate diagrams and better code from Figma context': '從 Figma 的內容產出圖表與更好的程式碼',
+    'Ideate, create, and deliver with Adobe pro tools': '用 Adobe 專業工具發想、製作並交付',
+    'Live financial data. Let Claude do the rest.': '即時金融資料，其餘交給 Claude。',
+    'Manage databases, authentication, and storage': '管理資料庫、身分驗證與儲存空間',
+    'Manage issues, projects & team workflows in Linear': '在 Linear 管理議題、專案與團隊工作流程',
+    'Manage tasks, plan your day, and build up memory of important context about your work. Syncs with your calendar, email, and chat to keep everything organized and on track.': '管理任務、規劃一天，並累積工作上重要脈絡的記憶。會與你的行事曆、電子郵件和聊天同步，讓一切井然有序、如期進行。',
+    'Manage your schedule and coordinate meetings effortlessly': '輕鬆管理行程並安排會議',
+    'Maryland’s neighborhood development data platform.': '馬里蘭州的社區發展資料平台。',
+    'monday.com project management & CRM for projects, tasks, portfolios, boards, workflows, milestones, dependencies, forms, dashboards, cross-project portfolio status, and critical paths.': 'monday.com 的專案管理與 CRM，涵蓋專案、任務、專案組合、看板、工作流程、里程碑、相依關係、表單、儀表板、跨專案的組合狀態與要徑。',
+    'Optimize business operations — vendor management, process documentation, change management, capacity planning, and compliance tracking. Keep your organization running efficiently.': '最佳化企業營運——供應商管理、流程文件、變更管理、產能規劃與法遵追蹤。讓組織持續高效運作。',
+    'Payment processing and financial infrastructure tools': '金流處理與財務基礎建設工具',
+    'PitchBook data, embedded in the way you work.': '把 PitchBook 的資料嵌進你的工作方式。',
+    'Query, chart and explain your data — SQL, spreadsheets and dashboards in one place.': '查詢資料、畫成圖表並加以解釋——SQL、試算表與儀表板集中在一處。',
+    'Read, annotate, and interact with PDF files — interactive viewer with search, navigation, annotations, form filling, and text extraction': '閱讀 PDF、加註解並操作內容——互動式檢視器，支援搜尋、導覽、註解、填表與文字擷取',
+    'Research and create for YouTube, Instagram & TikTok': '為 YouTube、Instagram 與 TikTok 做研究與創作',
+    'Research U.S. law in Claude—with citations you can open and verify.': '在 Claude 裡研究美國法律，附上可開啟查證的出處。',
+    'Search biomedical literature from PubMed': '搜尋 PubMed 的生物醫學文獻',
+    'Search literature, plan experiments, and analyze results.': '搜尋文獻、規劃實驗並分析結果。',
+    'Search trusted Microsoft docs to power your development': '搜尋可信的 Microsoft 文件輔助開發',
+    'Search, create, autofill, and export Canva designs': '搜尋、建立、自動填入並匯出 Canva 設計',
+    'Search, organize, and take action on your Dropbox content': '搜尋、整理並處理你的 Dropbox 內容',
+    'Search, query, and debug errors intelligently': '聰明地搜尋、查詢並除錯',
+    'Search, read and update Jira, Confluence, Bitbucket, Loom and other Atlassian apps with your existing Atlassian permissions.': '用你現有的 Atlassian 權限搜尋、讀取並更新 Jira、Confluence、Bitbucket、Loom 等 Atlassian 應用程式。',
+    'Search, read, and upload files instantly': '即時搜尋、讀取並上傳檔案',
+    'Sell, serve, and operate at scale with Salesforce.': '用 Salesforce 大規模銷售、服務與營運。',
+    'Send messages, create canvases, and fetch Slack data': '傳送訊息、建立畫布並取得 Slack 資料',
+    'Sketch, diagram, and iterate with your creative tools.': '用你的創意工具打草稿、畫圖並反覆修改。',
+    'Speed up contract review, NDA triage, and compliance workflows for in-house legal teams. Draft legal briefs, organize precedent research, and manage institutional knowledge.': '加快企業法務團隊的合約審閱、NDA 分流與法遵流程。擬法律摘要、整理判例研究並管理機構知識。',
+    'Streamline engineering workflows — standups, code review, architecture decisions, incident response, and technical documentation. Works with your existing tools or standalone.': '精簡工程流程——站立會議、程式碼審查、架構決策、事故應變與技術文件。可搭配你現有的工具，也可單獨使用。',
+    'Streamline finance and accounting workflows, from journal entries and reconciliation to financial statements and variance analysis. Speed up audit prep, month-end close, and keeping your books clean.': '精簡財會流程，從分錄與對帳到財務報表與差異分析。加快查核準備、月結與帳務整理。',
+    'Trade, invest, analyze, and manage global markets': '在全球市場交易、投資、分析與管理',
+    'View, annotate, and sign PDFs in a live interactive viewer. Mark up contracts, fill forms with visual feedback, stamp approvals, and place signatures — then download the annotated copy.': '在即時互動檢視器裡閱讀、註解並簽署 PDF。標註合約、邊填表邊看結果、蓋核准章、簽名，然後下載加註後的檔案。',
+    'Write feature specs, plan roadmaps, and synthesize user research faster. Keep stakeholders updated and stay ahead of the competitive landscape.': '更快寫出功能規格、規劃藍圖並整合使用者研究。隨時讓利害關係人掌握進度，並保持競爭優勢。',
     /* ---- 目錄分類（v3.15.0）。單字風險見 README：使用者的專案剛好同名時會被改到。 ---- */
     'Commerce and shopping': '電子商務與購物',
     'Communication': '通訊',
@@ -952,6 +1020,13 @@
     'Tell Claude what to change or remove': '告訴 Claude 要改什麼或移除什麼',
     'Claude breaks work into threads, gets them done, and reports back as it goes.': 'Claude 會把工作拆成討論串各自完成，過程中隨時回報。',
     'Threads to look at in the Overview': '總覽裡值得看一下的討論串',
+    /* 活動面板上固定的工具狀態字。旁邊那句一句一樣的說明是 Claude 當下生成的，
+       每次都不同，字典收不到，見 未採用字串.md。 */
+    'Running a command': '執行指令中',
+    'Adding repository': '新增儲存庫中',
+    'Posting a message': '張貼訊息中',
+    'Editing a file': '編輯檔案中',
+    'Creating a file': '建立檔案中',
     /* 下面五個同時列在 attrOnly：只有 aria-label / title 會翻，畫面文字不碰 */
     'Date': '日期',
     'State': '狀態',
@@ -1005,6 +1080,8 @@
     [/^Uploads: (.+)$/, (m) => '上傳：' + m[1]],
     [/^Zoom image: (.+)$/, (m) => '放大圖片：' + (known(m[1]) || m[1])],
     [/^Open (.+\.(?:md|txt|json|js|html|css|png|jpe?g|gif|svg|pdf))$/i, (m) => '開啟 ' + m[1]],
+    /* 活動面板的「Reading <檔名>」。限定副檔名，免得把「Reading list」這種名字改掉。 */
+    [/^Reading (.+\.(?:md|txt|json|js|ts|html|css|csv|png|jpe?g|gif|svg|pdf))$/i, (m) => '讀取 ' + m[1] + ' 中'],
 
     /* 用量的 5 小時上限 */
     [/^(\d+)% of 5-hour limit used\.$/, (m) => '已使用 5 小時上限的 ' + m[1] + '%。'],
@@ -1618,9 +1695,11 @@
       .trim();
   }
 
-  // 至少要有一個英文字母才值得查，純數字或已經是中文的直接跳過
+  // 至少要有一個英文字母才值得查，純數字或已經是中文的直接跳過。
+  // 上限 v3.16.0 從 200 放寬到 400：連接器說明文案最長的一句本文就有 199 字，
+  // 文字節點還會帶前後換行與縮排，200 剛好卡住，整句翻不出來。
   function looksTranslatable(s) {
-    return s.length > 0 && s.length < 200 && /[A-Za-z]/.test(s) && !/[一-鿿]/.test(s);
+    return s.length > 0 && s.length < 400 && /[A-Za-z]/.test(s) && !/[一-鿿]/.test(s);
   }
 
   function hasChinese(s) {
