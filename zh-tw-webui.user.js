@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         繁體中文介面（Claude + GitHub） v3.14.1
-// @name:zh-TW   繁體中文介面（Claude + GitHub） v3.14.1
+// @name         繁體中文介面（Claude + GitHub） v3.15.0
+// @name:zh-TW   繁體中文介面（Claude + GitHub） v3.15.0
 // @namespace    https://github.com/b010203044-code/zh-tw-webui
-// @version      3.14.1
+// @version      3.15.0
 // @description  把 claude.ai 與 github.com 的「介面文字」換成繁體中文（台灣用語）。只翻譯介面，絕不更動對話內容、程式碼、檔名、議題內文等使用者資料。
 // @author       Harry
 // @match        https://claude.ai/*
@@ -19,7 +19,7 @@
 
   /* 版本號。改版時四個地方要一起改：@name、@name:zh-TW、@version、這裡。
      @name 帶版本號是為了在油猴控制台與動作選單上一眼看得出跑的是哪一版。 */
-  const VERSION = '3.14.1';
+  const VERSION = '3.15.0';
 
   /* ------------------------------------------------------------------ *
    * 1. 共用保護區：所有站台都不動這些地方的文字
@@ -70,7 +70,9 @@
       attrOnly: ['App', 'Other', 'Kind', 'Size', 'Goal', 'Grid', 'List', 'Extra', 'Input', 'Output', 'Read',
                  'Personal', 'Folder', 'Check', 'Environment', 'Developer', 'Organization', 'Models',
                  'Tokens', 'Project', 'Select', 'Thread', 'Mode', 'Move', 'Prompt', 'High', 'Low',
-                 'All', 'Active', 'Idle', 'Name', 'Type', 'Status'],
+                 'All', 'Active', 'Idle', 'Name', 'Type', 'Status',
+                 /* v3.15.0：表格欄位與中繼資料值，跟上面同一類，使用者很可能拿來當名字 */
+                 'Date', 'State', 'Medium', 'None', 'Updated'],
 
       /* 刻意不翻、也不要再回報的字串（v3.10.0 新增）。
          產品名、品牌名、方案名、按鍵名這類本來就該保留英文，
@@ -85,7 +87,26 @@
               /* 作品清單的副檔名標籤，以及交談裡被 DOM 切碎的程式碼片段。
                  這些是識別碼不是介面文字，翻了反而看不懂。 */
               'js', 'ts', 'jsx', 'tsx', 'md', 'html', 'css', 'json', 'svg', 'txt', 'csv',
-              'yml', 'yaml', 'sh', 'py', 'commit', 'aria-label', 'outerHTML'],
+              'yml', 'yaml', 'sh', 'py', 'commit', 'aria-label', 'outerHTML',
+              /* v3.15.0：連接器目錄與外掛市集的產品名。全是第三方品牌，一律保留英文，
+                 列在這裡只是不要每次逛目錄都塞滿盤點清單。 */
+              'AI', 'APIs', 'AllTrails', 'Apollo.io', 'Asana', 'Atlassian MCP',
+              'Black Diamond', 'BlackRock Advisor Center', 'Canva', 'Chronograph',
+              'Chronograph GP', 'Chronograph LP', 'CMS Coverage', 'Datadog', 'Dropbox',
+              'Figma', 'Gamma', 'Gmail', 'Google Ads', 'Google Calendar', 'Google Drive',
+              'HubSpot', 'HyperFrames by HeyGen', 'ICD-10 Codes', 'incident.io',
+              'Interactive Brokers (IBKR)', 'Intuit QuickBooks', 'Leadfeeder', 'LINE',
+              'Linear', 'Links Connect', 'Maryland Community Compass', 'Microsoft 365',
+              'Microsoft Learn', 'Miro', 'monday.com', 'Notion', 'NPI Registry',
+              'Paxton Legal Research', 'PDF Viewer', 'PitchBook Premium', 'Postiz',
+              'PubMed', 'Rome2Rio', 'Salesforce', 'Sentry', 'Shopify', 'Slack', 'Sonos',
+              'Strava', 'Stripe', 'Supabase', 'Vanguard Advisor Tools', 'Vercel',
+              'Vibe Prospecting', 'vidIQ', 'Windsor.ai', 'Wingspan', 'Zapier', 'ZoomInfo',
+              'Sonnet 4.6', 'Opus 4.6', 'Claude Code', 'Cowork',
+              /* 載入動畫的趣味動詞。刻意保留英文，見 未採用字串.md 第一批。 */
+              'Forming', 'Kneading', 'Molding', 'Turning over',
+              /* Anthropic 的角色組合名，是品牌名不是敘述，保留英文 */
+              'Claude for design', 'Claude for legal', 'Claude for science'],
 
       dict: {
     /* ---- 側邊欄與導覽 ---- */
@@ -799,10 +820,212 @@
     'Microphone': '麥克風',
     'Use voice mode': '使用語音模式',
     'Use incognito': '使用無痕模式',
-    'just now': '剛剛'
+    'just now': '剛剛',
+
+    /* ---- 連接器目錄與外掛市集（v3.15.0）---- */
+    'Add connector': '新增連接器',
+    'Search connectors': '搜尋連接器',
+    'Top connectors': '熱門連接器',
+    'Trending connectors': '熱門趨勢連接器',
+    'New connectors': '新的連接器',
+    'Discover': '探索',
+    'Explore': '瀏覽',
+    'For you': '為你推薦',
+    'From Anthropic': '來自 Anthropic',
+    'Curated by Anthropic': 'Anthropic 精選',
+    'Featured bundles': '精選組合',
+    'Next bundle': '下一個組合',
+    'Previous bundle': '上一個組合',
+    'Verified': '已驗證',
+    'Trending': '熱門趨勢',
+    'Categories': '分類',
+    'Category': '分類',
+    'Submit to the directory': '提交到目錄',
+    'Build for the Claude Directory': '為 Claude 目錄開發',
+    'Software Directory Terms': '軟體目錄條款',
+    'Developer docs': '開發者文件',
+    'Desktop extensions': '桌面擴充功能',
+    'Desktop': '桌面',
+    'List your connector or plugin and reach everyone using Claude.': '上架你的連接器或外掛，讓所有 Claude 使用者都能找到。',
+    'Plugins': '外掛',
+    'Plugin Management': '外掛管理',
+    'Skills': '技能',
+    'Add plugin': '新增外掛',
+    'Add plugins': '新增外掛',
+    'Add skill': '新增技能',
+    'Add marketplace': '新增市集',
+    'Add repository': '新增儲存庫',
+    'Discover plugins': '探索外掛',
+    'Most installed plugins': '最多人安裝的外掛',
+    'Most installed skills': '最多人安裝的技能',
+    'New plugins': '新的外掛',
+    'New skills': '新的技能',
+    'Search skills and plugins': '搜尋技能與外掛',
+    'Your marketplaces': '你的市集',
+    'No personal marketplaces yet.': '還沒有個人市集。',
+    'No plugins added to this project yet.': '這個專案還沒有加入外掛。',
+    'Add your first plugins': '加入第一個外掛',
+    'Changes apply to new threads.': '變更只會套用到新的討論串。',
+    'Plugins Claude can use in this project. They load into each new thread.': 'Claude 在這個專案可以使用的外掛。每一條新討論串都會載入。',
+    'Give Claude role-level expertise with plugins. Add them from Discover, or create your own.': '用外掛讓 Claude 具備特定角色的專業能力。可以從「探索」加入，也可以自己做一個。',
+    'Add a Git repository of plugins. Marketplaces you add here are personal. Enabled plugins load in your own threads in this and every project.': '加入一個放著外掛的 Git 儲存庫。在這裡加入的市集屬於你個人。啟用的外掛會載入你在本專案以及所有專案的討論串。',
+
+    /* ---- 目錄分類（v3.15.0）。單字風險見 README：使用者的專案剛好同名時會被改到。 ---- */
+    'Commerce and shopping': '電子商務與購物',
+    'Communication': '通訊',
+    'Community': '社群',
+    'Contacts & leads': '聯絡人與潛在客戶',
+    'Data': '資料',
+    'Databases': '資料庫',
+    'Education': '教育',
+    'Engineering': '工程',
+    'Files & documents': '檔案與文件',
+    'Finance': '財務',
+    'Financial services': '金融服務',
+    'General': '一般',
+    'Health': '健康',
+    'Legal': '法務',
+    'Life sciences': '生命科學',
+    'Marketing': '行銷',
+    'Media and entertainment': '媒體與娛樂',
+    'Nonprofit': '非營利',
+    'Operations': '營運',
+    'Pipelines & jobs': '管線與工作',
+    'Product Management': '產品管理',
+    'Productivity': '生產力',
+    'Sales': '銷售',
+    'Sales and marketing': '銷售與行銷',
+    'Tickets & tasks': '票務與任務',
+    'Travel': '旅遊',
+
+    /* ---- 專案與討論串介面（v3.15.0）---- */
+    'Activity panel': '活動面板',
+    'Session activity panel': '工作階段活動面板',
+    'Archived': '已封存',
+    'Unread': '未讀',
+    'Mark as read': '標示為已讀',
+    'Mark as unread': '標示為未讀',
+    'Move to': '移動到',
+    'Move to group': '移動到群組',
+    'New group…': '新增群組…',
+    'Customize sections': '自訂區塊',
+    'Edit sidebar…': '編輯側邊欄…',
+    'Show sidebar': '顯示側邊欄',
+    'Pin project': '釘選專案',
+    'Add to project': '加入專案',
+    'In this project': '在這個專案裡',
+    'Instructions': '指示',
+    'Memory': '記憶',
+    'View memory': '查看記憶',
+    'Files': '檔案',
+    'Message': '訊息',
+    'Open thread': '開啟討論串',
+    'Copy session ID': '複製工作階段 ID',
+    'Open as quick task': '以快速任務開啟',
+    'Bulk actions for older sessions': '較舊工作階段的批次操作',
+    'Load earlier messages': '載入較早的訊息',
+    'Not running': '未執行',
+    'yesterday': '昨天',
+    'now': '剛剛',
+    'File view mode': '檔案檢視模式',
+    'Resize file viewer': '調整檔案檢視器大小',
+    'Image preview': '圖片預覽',
+    'Attached image': '附加的圖片',
+    'Read aloud': '朗讀',
+    'Link copied to clipboard.': '已複製連結到剪貼簿。',
+    'Currently streaming message': '正在串流的訊息',
+    'Claude is booting up': 'Claude 正在啟動',
+    'Claude is responding': 'Claude 正在回覆',
+    'Claude is AI and can make mistakes.': 'Claude 是 AI，可能會出錯。',
+    'Use the up and down arrow keys to move between messages.': '用上下方向鍵在訊息之間移動。',
+    'Sent to one thread': '已送到一條討論串',
+    'Set up manually': '手動設定',
+    'Set up this project from my recent work': '用我最近的工作設定這個專案',
+    'Let Claude coordinate this project': '讓 Claude 協調這個專案',
+    'Cowork setup': 'Cowork 設定',
+    'Get started': '開始使用',
+    'Create with Claude': '用 Claude 創作',
+    'Help me set up my code connection': '協助我設定程式碼連線',
+    'Cloud environment': '雲端環境',
+    'cloud environment': '雲端環境',
+    'In-chat UI': '交談內介面',
+    'Tell Claude what to change or remove': '告訴 Claude 要改什麼或移除什麼',
+    'Claude breaks work into threads, gets them done, and reports back as it goes.': 'Claude 會把工作拆成討論串各自完成，過程中隨時回報。',
+    'Threads to look at in the Overview': '總覽裡值得看一下的討論串',
+    /* 下面五個同時列在 attrOnly：只有 aria-label / title 會翻，畫面文字不碰 */
+    'Date': '日期',
+    'State': '狀態',
+    'Medium': '中',
+    'None': '無',
+    'Updated': '已更新'
       },
 
       patterns: [
+    /* 用 ` — ` 串起來的複合 aria-label：Thread — View thread — Idle、
+       Open thread — 3 replies — New messages。每一段都查得到才翻，
+       有一段查不到就整串不動，免得拼出半中半英。 */
+    [/^[^—]+(?: — [^—]+)+$/, (m) => {
+      const parts = m[0].split(' — ');
+      const out = [];
+      for (const part of parts) {
+        const t = translateString(part, true);
+        if (!t) return null;
+        out.push(t);
+      }
+      return out.join(' — ');
+    }],
+
+    /* 連接器目錄與外掛市集 */
+    [/^Connect (.+) to Claude$/, (m) => '將 ' + m[1] + ' 連接到 Claude'],
+    [/^(.+) is connected$/, (m) => m[1] + ' 已連接'],
+    [/^([\d,]+) installs across all of Claude$/, (m) => '全 Claude 共 ' + m[1] + ' 次安裝'],
+    [/^([\d.]+[KMB]) installs$/, (m) => m[1] + ' 次安裝'],
+    [/^Show all (\d+)$/, (m) => '顯示全部 ' + m[1] + ' 個'],
+    /* 「<分類>, 43 items」與「Show all: <區塊>」：前半查得到字典才翻 */
+    [/^(.+), (\d+) items?$/, (m) => {
+      const t = known(m[1]);
+      return t ? t + '，' + m[2] + ' 個項目' : null;
+    }],
+    [/^Show all: (.+)$/, (m) => {
+      const t = known(m[1]);
+      return t ? '顯示全部：' + t : null;
+    }],
+
+    /* 訊息與活動面板 */
+    [/^Message (\d+) of (\d+)$/, (m) => '第 ' + m[1] + ' 則訊息，共 ' + m[2] + ' 則'],
+    [/^(\d+) repl(?:y|ies)$/, (m) => m[1] + ' 則回覆'],
+    [/^Web search: (\d+) searches?$/, (m) => '網頁搜尋：' + m[1] + ' 次'],
+    [/^Web search: (\d+) searches?, (\d+) sites? read$/,
+      (m) => '網頁搜尋：' + m[1] + ' 次，讀取 ' + m[2] + ' 個網站'],
+    [/^Memory: (Read|Updated) · (.+)$/,
+      (m) => '記憶：' + (m[1] === 'Read' ? '讀取' : '已更新') + ' · ' + m[2]],
+    [/^(Read|Updated) · (.+)$/,
+      (m) => (m[1] === 'Read' ? '讀取' : '已更新') + ' · ' + m[2]],
+    /* 後面接的是檔名，原樣帶過去 */
+    [/^Uploads: (.+)$/, (m) => '上傳：' + m[1]],
+    [/^Zoom image: (.+)$/, (m) => '放大圖片：' + (known(m[1]) || m[1])],
+    [/^Open (.+\.(?:md|txt|json|js|html|css|png|jpe?g|gif|svg|pdf))$/i, (m) => '開啟 ' + m[1]],
+
+    /* 用量的 5 小時上限 */
+    [/^(\d+)% of 5-hour limit used\.$/, (m) => '已使用 5 小時上限的 ' + m[1] + '%。'],
+    [/^Usage: (\d+)% of 5-hour limit, Compacts automatically$/,
+      (m) => '用量：5 小時上限的 ' + m[1] + '%，自動壓縮', true],
+
+    /* 「Add / View <已知介面字>」。查得到字典才翻，查不到（連接器名、使用者專案名）就不動。 */
+    [/^Add (.+)$/, (m) => { const t = known(m[1]); return t ? joinZh('新增', t) : null; }],
+    [/^View (.+)$/, (m) => { const t = known(m[1]); return t ? joinZh('查看', t) : null; }],
+    [/^Show (.+)$/, (m) => { const t = known(m[1]); return t ? joinZh('顯示', t) : null; }],
+    [/^Remove (.+)$/, (m) => { const t = known(m[1]); return t ? joinZh('移除', t) : null; }],
+
+    /* 總覽的討論串計數 */
+    [/^(\d+) still open$/, (m) => m[1] + ' 條仍未結'],
+    [/^(\d+) completed$/, (m) => m[1] + ' 條已完成'],
+    [/^(\d+) needs? attention$/, (m) => m[1] + ' 條需要處理'],
+
+    /* 附件上的移除鈕，括號裡是檔名。只在屬性裡翻，免得改到畫面上的檔名。
+       排在上面那條查表版後面，查不到字典時才輪到它。 */
+    [/^Remove (.+)$/, (m) => '移除 ' + m[1], true],
+
     /* 分頁標題「<介面字> - Claude」。前半查得到字典才翻；查不到就整串不動，
        因為那八成是使用者自己的交談或專案名稱。 */
     [/^(.+) - Claude$/, (m) => {
@@ -832,8 +1055,6 @@
       (m) => ({ Morning: '早安', Afternoon: '午安', Evening: '晚安', Night: '晚安' })[m[1]] + '，' + m[2]],
     /* 表情符號名稱維持英文（就是上面那些 shortcode） */
     [/^Claude reacted with (.+)$/, (m) => 'Claude 用 ' + m[1] + ' 回應'],
-    /* 附件上的移除鈕，括號裡是檔名。只在屬性裡翻，免得改到畫面上的檔名。 */
-    [/^Remove (.+)$/, (m) => '移除 ' + m[1], true],
 
     /* 側邊欄用量的 aria-label。百分比與重設時間會變動，所以用規則；
        時間本身照原樣帶入，不翻（日期時間一律不動）。 */
@@ -1436,6 +1657,9 @@
     // 下面那條 30 字上限吃不到它。
     if (/^(Sun|Mon|Tues|Wednes|Thurs|Fri|Satur)day,\s/.test(s)) return true;
 
+    // 逗號分隔的檔名清單：1789418499461_image.png, IMG_7981.jpeg
+    if (/^\S+\.[A-Za-z0-9]{2,5}(?:,\s*\S+\.[A-Za-z0-9]{2,5})+$/.test(s)) return true;
+
     // 網址、email
     if (/:\/\//.test(s) || /^www\./i.test(s)) return true;
     if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s)) return true;
@@ -1450,6 +1674,22 @@
     return false;
   }
 
+  /* 複合字串的零件查表：字典有就回譯文；列在 never 的（產品名、縮寫）回原文，
+     這樣「APIs, 43 items」才會變成「APIs，43 個項目」而不是整串不翻；
+     其餘回 null，代表那是使用者自己的名字，整條規則就放棄。 */
+  function known(part) {
+    const k = normalize(part);
+    const hit = LOOKUP.get(k);
+    if (hit) return hit;
+    if (NEVER.has(k)) return part;
+    return null;
+  }
+
+  /* 中文前綴接英文名字時補一個空格：新增 + incident.io → 「新增 incident.io」 */
+  function joinZh(prefix, tail) {
+    return prefix + (/^[A-Za-z0-9(]/.test(tail) ? ' ' : '') + tail;
+  }
+
   function translateString(raw, isAttr) {
     if (!looksTranslatable(raw)) return null;
     const key = normalize(raw);
@@ -1460,7 +1700,11 @@
     for (const [re, fn, attrOnly] of PATTERNS) {
       if (attrOnly && !isAttr) continue;
       const m = key.match(re);
-      if (m) return fn(m);
+      if (!m) continue;
+      /* 規則命中但回傳 null，代表「這條規則處理不了」（例如前半查不到字典），
+         要繼續往下找，不能就此放棄——否則排在前面的寬鬆規則會擋掉後面的。 */
+      const out = fn(m);
+      if (out) return out;
     }
     return null;
   }

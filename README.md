@@ -70,6 +70,12 @@ Chrome 系列要多做一步：到 `chrome://extensions`，把右上角的**開�
 
 > `Artifacts` 原本歸在保留英文那欄，v3.12.0 改譯為「作品」。理由是那一頁裝的是文件、投影片、Design 與 HTML 檔，都是做完可以單獨打開的東西，「作品」涵蓋得到；「文件」已經被 `Docs` 用掉，會撞名。GitHub 的 `Artifacts`（Actions 工作流程的產出檔）是另一回事，維持英文。
 
+> v3.15.0 的取捨：
+> - 連接器目錄的**分類名稱**（`Engineering`、`Finance`、`Marketing`、`Travel`…）有翻。代價跟 `Document` / `Design` 一樣：你的專案剛好同名時會被改到。要退掉就把那幾行的 key 搬進 `attrOnly`。
+> - 連接器與外掛的**產品名**（`Asana`、`Figma`、`Notion`…約 60 個）一律保留英文，已列進 `never`，不會再出現在盤點清單。
+> - 連接器的**說明文案**（`Search, create, autofill, and export Canva designs` 這種）**不翻**。那是第三方廠商自己寫的，數量沒有上限、隨時會改，收進字典只會愈積愈多。
+> - `Date`、`State`、`Medium`、`None`、`Updated` 收進字典但同時列進 `attrOnly`，跟 `Name`、`Type`、`Status` 同一類：畫面上維持英文，只有 `aria-label` 會翻。
+
 > v3.13.0 的幾個取捨：
 > - `Context` → 上下文、`Context window` → 上下文視窗，跟 Claude 官方中文文件一致。
 > - 表情符號的 shortcode（`:smile:`、`:point_up_2:`）**絕對不翻**，那是搜尋用的識別碼，翻了就搜不到。面板的分類標題（`Smileys & People` 等）才是介面，有翻。
@@ -136,6 +142,20 @@ attrOnly: ['App', 'Other', 'Kind', 'Size', 'Goal', 'Grid', 'List', 'Extra', 'Inp
 
 數字規則的第三個元素也可以設 `true` 表示「只在屬性裡套用」，例如 `/^(.+) icon$/` 就是這樣，
 免得一個叫 `something icon` 的檔案被改掉。
+
+### 規則回傳 null 的意思（v3.15.0）
+
+`patterns` 的函式回傳 `null` 表示「這條規則處理不了」，引擎會**繼續往下找**，
+而不是就此放棄。這樣才寫得出「前半查得到字典才翻」這種規則：
+
+```js
+[/^Add (.+)$/, (m) => { const t = known(m[1]); return t ? joinZh('新增', t) : null; }],
+```
+
+`known()` 是複合字串的零件查表：字典有就回譯文，列在 `never` 的產品名回原文，
+其餘回 `null`（那八成是使用者自己的名字，整條規則就放棄）。
+所以 `Add connector` → 新增連接器、`Add incident.io` → 新增 incident.io，
+而 `Add Chronograph GP`（你自己的外掛）維持原樣。
 
 ### 第 3 段：查表核心（搜尋 `* 3.`）
 
