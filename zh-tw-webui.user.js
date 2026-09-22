@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         繁體中文介面（Claude + GitHub） v3.13.0
-// @name:zh-TW   繁體中文介面（Claude + GitHub） v3.13.0
+// @name         繁體中文介面（Claude + GitHub） v3.14.0
+// @name:zh-TW   繁體中文介面（Claude + GitHub） v3.14.0
 // @namespace    https://github.com/b010203044-code/zh-tw-webui
-// @version      3.13.0
+// @version      3.14.0
 // @description  把 claude.ai 與 github.com 的「介面文字」換成繁體中文（台灣用語）。只翻譯介面，絕不更動對話內容、程式碼、檔名、議題內文等使用者資料。
 // @author       Harry
 // @match        https://claude.ai/*
@@ -19,7 +19,7 @@
 
   /* 版本號。改版時四個地方要一起改：@name、@name:zh-TW、@version、這裡。
      @name 帶版本號是為了在油猴控制台與動作選單上一眼看得出跑的是哪一版。 */
-  const VERSION = '3.13.0';
+  const VERSION = '3.14.0';
 
   /* ------------------------------------------------------------------ *
    * 1. 共用保護區：所有站台都不動這些地方的文字
@@ -564,6 +564,10 @@
     'Read every thread': '讀取所有討論串',
     'Reconnect the Claude GitHub App': '重新連接 Claude GitHub App',
     'Recycle the worker running this project’s coordinator. Any in-flight turn will be interrupted.': '回收重啟執行此專案協調者的工作處理程序（worker）。任何進行中的回合都會被中斷。',
+    /* 拖放釘選的四句是一組，只收其中一句會變成拖到一半中英夾雜。 */
+    'Drag to pin': '拖曳以釘選',
+    'Drag to unpin': '拖曳以取消釘選',
+    'Release to pin': '放開以釘選',
     'Release to unpin': '放開以取消釘選',
     'Reorder Idle': '重新排序「閒置」',
     'Reorder Resolved': '重新排序「已解決」',
