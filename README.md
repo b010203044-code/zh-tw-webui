@@ -1,10 +1,10 @@
 # 繁體中文介面（Claude + GitHub）
 
-腳本檔：`zh-tw-webui.user.js`（v3.18.0）
+腳本檔：`zh-tw-webui.user.js`（v3.19.0）
 安裝連結：[zh-tw-webui.user.js](https://raw.githubusercontent.com/b010203044-code/zh-tw-webui/main/zh-tw-webui.user.js)（Tampermonkey 裝好後點這個連結會直接跳出安裝畫面）
 用途：把 **claude.ai** 和 **github.com** 的介面文字換成繁體中文（台灣用語），不動你的對話內容、程式碼、檔名、議題內文等使用者資料。
 
-字典規模：claude.ai 897 條 + 103 條規則；github.com 360 條 + 30 條規則。
+字典規模：claude.ai 898 條 + 103 條規則；github.com 360 條 + 30 條規則。
 未採用的字串與原因整理在 [未採用字串.md](未採用字串.md)。
 
 > GitHub 網頁介面目前沒有官方的中文選項（使用者社群還在許願階段），所以只能靠腳本翻。claude.ai 也沒有。
@@ -48,6 +48,9 @@ Chrome 系列要多做一步：到 `chrome://extensions`，把右上角的**開�
 - **匯出累積清單（看你去過的所有畫面）**（v3.9.0 新增）：按 `Ctrl + Alt + E`。
   腳本平常就會在背景默默累積漏翻的字串，你不用按任何鍵；按 `E` 是把累積到現在的全部倒出來，
   複製到剪貼簿之後清空，重新開始累積。詳見〈九〉的「背景累積」。
+- **看漏翻的字串出現在哪裡**（v3.19.0 新增）：按 `Ctrl + Alt + W`，會把這一頁每一種沒翻到的字串
+  連同它在網頁結構裡的位置複製到剪貼簿。用途是判斷某段文字到底是「介面」還是「你自己的資料」——
+  前者該補字典，後者該列進保護區。清單上每一行還會標示 `[保護區]` 或 `[未保護]`。
 - **看目前跑哪一版**（v3.8.0 起，三種都可以）：
   1. 點 Tampermonkey 圖示，選單上的腳本名稱後面就帶著版本號，例如「繁體中文介面（Claude + GitHub） v3.9.0」。
   2. 按 `Ctrl + Alt + D`，主控台標題與剪貼簿清單的標頭都會寫版本。
@@ -244,6 +247,27 @@ attrOnly: ['App', 'Other', 'Kind', 'Size', 'Goal', 'Grid', 'List', 'Extra', 'Inp
 > 是這一頁本來就有那些字。尤其你把上一份清單貼進交談後，清單本身就是頁面內容。
 > 想確認清空成功，按完 E 立刻在主控台看 `zhTwWebui.collected()`。
 > **要看單一頁面還缺什麼，請用 `Ctrl + Alt + D`**；`E` 是給「逛過好幾頁之後一次收齊」用的。
+
+### 第 6.6 段：這些字在哪裡（搜尋 `* 6.6`，v3.19.0 新增）
+
+`Ctrl + Alt + W` 呼叫 `whereMissing()`，主控台也可以直接叫 `zhTwWebui.whereMissing()`。
+它把這一頁沒翻到的字串，連同它所在的元素路徑一起印出來，例如：
+
+```
+[未保護] Rebuilding harness module
+          body > div[data-testid="timeline"] > a[data-thread-id="cmsg_1"].thread-card > span.text-sm
+[保護區] Testing the apostrophe mismatch hypothesis
+          body > div.font-claude-message
+```
+
+**為什麼需要這個**：盤點清單裡有一大半根本不是 claude.ai 的介面，而是討論串標題、
+進度清單、Claude 的回覆內容——那些是你的資料，本來就不該翻，應該列進保護區。
+但要列進保護區得先知道它們在網頁結構裡長什麼樣子，以前只能請你開開發人員工具去抄。
+現在按一個鍵就有了。
+
+同一種容器只報一次（路徑相同就跳過），預設最多 40 條，`whereMissing(100)` 可以放寬。
+想查特定一句話在哪，用 `zhTwWebui.where('那句話')`，它連保護區裡的也會列出來，
+方便確認保護有沒有生效。
 
 ### 第 6.9 段：分頁標題（搜尋 `* 6.9`，v3.13.0 新增）
 

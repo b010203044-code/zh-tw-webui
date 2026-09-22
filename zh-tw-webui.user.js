@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         繁體中文介面（Claude + GitHub） v3.18.0
-// @name:zh-TW   繁體中文介面（Claude + GitHub） v3.18.0
+// @name         繁體中文介面（Claude + GitHub） v3.19.0
+// @name:zh-TW   繁體中文介面（Claude + GitHub） v3.19.0
 // @namespace    https://github.com/b010203044-code/zh-tw-webui
-// @version      3.18.0
+// @version      3.19.0
 // @description  把 claude.ai 與 github.com 的「介面文字」換成繁體中文（台灣用語）。只翻譯介面，絕不更動對話內容、程式碼、檔名、議題內文等使用者資料。
 // @author       Harry
 // @match        https://claude.ai/*
@@ -19,7 +19,7 @@
 
   /* 版本號。改版時四個地方要一起改：@name、@name:zh-TW、@version、這裡。
      @name 帶版本號是為了在油猴控制台與動作選單上一眼看得出跑的是哪一版。 */
-  const VERSION = '3.18.0';
+  const VERSION = '3.19.0';
 
   /* ------------------------------------------------------------------ *
    * 1. 共用保護區：所有站台都不動這些地方的文字
@@ -72,7 +72,10 @@
                  'Tokens', 'Project', 'Select', 'Thread', 'Mode', 'Move', 'Prompt', 'High', 'Low',
                  'All', 'Active', 'Idle', 'Name', 'Type', 'Status',
                  /* v3.15.0：表格欄位與中繼資料值，跟上面同一類，使用者很可能拿來當名字 */
-                 'Date', 'State', 'Medium', 'None', 'Updated'],
+                 'Date', 'State', 'Medium', 'None', 'Updated',
+                 /* v3.19.0：討論串卡片與進度清單的狀態字。小寫、太泛用，
+                    畫面上一律不碰，只在 aria-label 裡翻。 */
+                 'in progress', 'not done', 'done', 'running', 'View'],
 
       /* 刻意不翻、也不要再回報的字串（v3.10.0 新增）。
          產品名、品牌名、方案名、按鍵名這類本來就該保留英文，
@@ -113,7 +116,10 @@
               'doc-coauthoring', 'docs', 'import-memory', 'internal-comms', 'mcp-builder',
               'morning', 'recipe-rainbow-island', 'skill-creator', 'slack-gif-creator',
               'theme-factory', 'web-artifacts-builder', 'pdf-viewer', 'learn',
-              'Adobe for creativity', 'S&P - Deterministic Retrieval', 'Apollo.io', 'Windsor.ai'],
+              'Adobe for creativity', 'S&P - Deterministic Retrieval', 'Apollo.io', 'Windsor.ai',
+              /* v3.19.0：「Drag to pin」「Release to unpin」被 DOM 切成兩半的碎片。
+                 整串版本字典早就收了，碎片拼不回正確語順，也不要再回報。 */
+              'Drag', 'Drag to', 'to pin', 'to unpin', 'pin', 'Release'],
 
       dict: {
     /* ---- 側邊欄與導覽 ---- */
@@ -794,6 +800,8 @@
     'View usage in Settings': '在設定中查看用量',
     'Get more usage': '取得更多用量',
     'Approaching weekly limit': '接近每週上限',
+    /* 兩顆元素被當成同一段文字抓到（v3.19.0）。分開的兩條上面各自都有。 */
+    'Approaching weekly limit Get more usage': '接近每週上限　取得更多用量',
     'That is your tightest limit right now.': '這是你目前最吃緊的上限。',
     'Weekly · all models': '每週 · 所有模型',
     'Resets': '重設時間',
@@ -2236,12 +2244,121 @@
     return { missing: list, stats: stats };
   }
 
+  /* ------------------------------------------------------------------ *
+   * 6.6 這些字在哪裡（v3.19.0）
+   *
+   * 為什麼需要這個：盤點清單裡有一大半根本不是 claude.ai 的介面，而是
+   * 專案時間軸的討論串標題、討論串的進度清單、Claude 的回覆內容——
+   * 也就是「使用者資料」。那些地方應該列進 protect 保護區，可是
+   * 要列進去得先知道它們在 DOM 裡長什麼樣子。
+   *
+   * whereMissing() 會把這一頁每一條還沒翻到的字串，連同它所在的元素路徑
+   * 一起印出來並複製到剪貼簿，這樣不必開開發人員工具也拿得到選擇器。
+   * ------------------------------------------------------------------ */
+
+  /* 把一個元素描述成「標籤 + id + data-* 屬性 + 前三個 class」。
+     data-* 是最穩定的鉤子，所以擺在 class 前面。 */
+  function describeEl(el) {
+    let out = el.tagName.toLowerCase();
+    if (el.id) out += '#' + el.id;
+    for (const a of el.attributes) {
+      if (a.name === 'role' || a.name.indexOf('data-') === 0) {
+        out += '[' + a.name + (a.value ? '="' + a.value + '"' : '') + ']';
+      }
+    }
+    const cls = typeof el.className === 'string' ? el.className.trim() : '';
+    if (cls) out += '.' + cls.split(/\s+/).slice(0, 3).join('.');
+    return out;
+  }
+
+  /* 從節點往上走，回傳可讀的祖先路徑。預設看 6 層，夠找出穩定的容器。 */
+  function pathOf(node, depth) {
+    const parts = [];
+    let el = node.nodeType === 3 ? node.parentElement : node;
+    while (el && el !== document.documentElement && parts.length < (depth || 6)) {
+      parts.unshift(describeEl(el));
+      el = el.parentElement;
+    }
+    return parts.join(' > ');
+  }
+
+  /* 指定一段文字，回報它出現在哪裡（保護區裡的也照報，因為要確認保護有沒有生效）。 */
+  function where(text, depth) {
+    const want = normalize(String(text));
+    const hits = [];
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    let node;
+    while ((node = walker.nextNode())) {
+      const raw = node.nodeValue;
+      if (!raw || !raw.trim()) continue;
+      if (normalize(raw) !== want) continue;
+      hits.push({
+        text: want,
+        protected: isProtected(node.parentElement),
+        path: pathOf(node, depth)
+      });
+    }
+    console.log('[zh-tw-webui v' + VERSION + '] 「' + want + '」找到 ' + hits.length + ' 處');
+    hits.forEach((h) => console.log((h.protected ? '  [保護區] ' : '  [未保護] ') + h.path));
+    return hits;
+  }
+
+  /* 這一頁所有還沒翻到的字串 + 它們所在的位置，整份複製到剪貼簿。
+     預設最多 40 條，重複的路徑只留一次。 */
+  function whereMissing(limit) {
+    const max = limit || 40;
+    const seenPath = new Map();     // 路徑 -> 範例字串
+    const rows = [];
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    let node;
+    while ((node = walker.nextNode()) && rows.length < max) {
+      const raw = node.nodeValue;
+      if (!raw || !raw.trim()) continue;
+      const parent = node.parentElement;
+      if (!parent) continue;
+      if (/[一-鿿]/.test(raw)) continue;      // 已經是中文
+      if (!stillMissing(raw)) continue;
+      const path = pathOf(node, 6);
+      if (seenPath.has(path)) continue;               // 同一種容器報一次就夠
+      seenPath.set(path, normalize(raw));
+      rows.push({
+        text: normalize(raw),
+        protected: isProtected(parent),
+        path: path
+      });
+    }
+
+    const report = [
+      '# 這一頁沒翻到的字串出現在哪裡（' + rows.length + ' 種位置）',
+      '# 站台：' + site.label + '　版本：v' + VERSION,
+      '# [保護區] = 已經受保護，不會被改；[未保護] = 目前沒保護',
+      ''
+    ].concat(
+      rows.map((r) =>
+        (r.protected ? '[保護區] ' : '[未保護] ') + r.text.slice(0, 60) +
+        '\n          ' + r.path)
+    ).join('\n');
+
+    console.log(report);
+    try {
+      navigator.clipboard.writeText(report).then(
+        () => toast('已複製 ' + rows.length + ' 種位置到剪貼簿'),
+        () => toast('完成：' + rows.length + ' 種位置。剪貼簿失敗，請從主控台複製')
+      );
+    } catch (e) {
+      toast('完成：' + rows.length + ' 種位置，請從主控台複製');
+    }
+    return rows;
+  }
+
   // 也掛到 window，方便直接在主控台叫：zhTwWebui.diagnose() / zhTwWebui.export()
   try {
     window.zhTwWebui = {
       diagnose: diagnose,
       export: exportCollected,
       clear: clearCollected,             // 只清空不匯出
+      where: where,                      // 某段文字在 DOM 的哪裡
+      whereMissing: whereMissing,        // 這一頁沒翻到的字串分別在哪裡（會複製到剪貼簿）
       collected: () => collected.size,   // 現在累積了幾條
       version: VERSION,
       site: site.label
@@ -2271,6 +2388,11 @@
     if (e.ctrlKey && e.altKey && (e.key === 'e' || e.key === 'E')) {
       e.preventDefault();
       exportCollected();
+    }
+    /* v3.19.0：這一頁沒翻到的字串分別出現在哪裡 */
+    if (e.ctrlKey && e.altKey && (e.key === 'w' || e.key === 'W')) {
+      e.preventDefault();
+      whereMissing();
     }
   }, true);
 
