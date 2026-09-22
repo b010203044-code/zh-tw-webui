@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         繁體中文介面（Claude + GitHub） v3.19.0
-// @name:zh-TW   繁體中文介面（Claude + GitHub） v3.19.0
+// @name         繁體中文介面（Claude + GitHub） v3.20.0
+// @name:zh-TW   繁體中文介面（Claude + GitHub） v3.20.0
 // @namespace    https://github.com/b010203044-code/zh-tw-webui
-// @version      3.19.0
+// @version      3.20.0
 // @description  把 claude.ai 與 github.com 的「介面文字」換成繁體中文（台灣用語）。只翻譯介面，絕不更動對話內容、程式碼、檔名、議題內文等使用者資料。
 // @author       Harry
 // @match        https://claude.ai/*
@@ -19,7 +19,7 @@
 
   /* 版本號。改版時四個地方要一起改：@name、@name:zh-TW、@version、這裡。
      @name 帶版本號是為了在油猴控制台與動作選單上一眼看得出跑的是哪一版。 */
-  const VERSION = '3.19.0';
+  const VERSION = '3.20.0';
 
   /* ------------------------------------------------------------------ *
    * 1. 共用保護區：所有站台都不動這些地方的文字
@@ -62,7 +62,15 @@
         '[data-testid="message-content"]',
         '[data-testid="artifact-content"]',
         '[data-testid="file-thumbnail"]',
-        '.katex'
+        '.katex',
+        /* 專案介面（v3.20.0）。上面那幾條是交談頁用的，專案時間軸另有一套結構，
+           以前完全沒保護到——討論串摘要、輸出檔名、使用者名稱都是使用者資料，
+           萬一剛好跟字典的鍵一模一樣就會被整段改掉，同 v3.2.0 `docs` 資料夾那次。
+           路徑是 v3.19.0 的 Ctrl + Alt + W 回報的。 */
+        '.cds-user-message-body',                          // 時間軸上的訊息內容
+        '[data-testid="channel-created-thread-summary"]',  // 討論串卡片的摘要那一行
+        '[data-testid="root-output-attachment"]',          // 卡片上的產出檔名
+        '[data-testid="user-menu-button"]'                 // 左下角你自己的名字
       ],
 
       /* 這些泛用單字只在 aria-label / title 等屬性裡翻譯。畫面上的文字節點不碰，

@@ -1,6 +1,6 @@
 # 繁體中文介面（Claude + GitHub）
 
-腳本檔：`zh-tw-webui.user.js`（v3.19.0）
+腳本檔：`zh-tw-webui.user.js`（v3.20.0）
 安裝連結：[zh-tw-webui.user.js](https://raw.githubusercontent.com/b010203044-code/zh-tw-webui/main/zh-tw-webui.user.js)（Tampermonkey 裝好後點這個連結會直接跳出安裝畫面）
 用途：把 **claude.ai** 和 **github.com** 的介面文字換成繁體中文（台灣用語），不動你的對話內容、程式碼、檔名、議題內文等使用者資料。
 
@@ -59,6 +59,7 @@ Chrome 系列要多做一步：到 `chrome://extensions`，把右上角的**開�
   累積的漏翻清單另外存在 `zh-tw-webui-collected-claude` 與 `zh-tw-webui-collected-github`，兩個站台分開記。
 - **不會被翻譯的地方**（刻意設計）：
   - claude.ai：你的訊息、Claude 的回應、程式碼區塊、輸入框、Artifact 內容
+  - claude.ai 專案（v3.20.0 補上）：時間軸的訊息內容、討論串卡片的摘要、產出檔名、左下角你的名字
   - github.com：程式碼與 diff、議題與留言內文、檔名與路徑、分支名、commit 訊息、儲存庫名稱與說明、使用者名稱、標籤名稱
 
 ---
