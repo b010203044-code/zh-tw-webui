@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         繁體中文介面（Claude + GitHub） v3.16.0
-// @name:zh-TW   繁體中文介面（Claude + GitHub） v3.16.0
+// @name         繁體中文介面（Claude + GitHub） v3.17.0
+// @name:zh-TW   繁體中文介面（Claude + GitHub） v3.17.0
 // @namespace    https://github.com/b010203044-code/zh-tw-webui
-// @version      3.16.0
+// @version      3.17.0
 // @description  把 claude.ai 與 github.com 的「介面文字」換成繁體中文（台灣用語）。只翻譯介面，絕不更動對話內容、程式碼、檔名、議題內文等使用者資料。
 // @author       Harry
 // @match        https://claude.ai/*
@@ -19,7 +19,7 @@
 
   /* 版本號。改版時四個地方要一起改：@name、@name:zh-TW、@version、這裡。
      @name 帶版本號是為了在油猴控制台與動作選單上一眼看得出跑的是哪一版。 */
-  const VERSION = '3.16.0';
+  const VERSION = '3.17.0';
 
   /* ------------------------------------------------------------------ *
    * 1. 共用保護區：所有站台都不動這些地方的文字
@@ -871,6 +871,42 @@
     'Add a Git repository of plugins. Marketplaces you add here are personal. Enabled plugins load in your own threads in this and every project.': '加入一個放著外掛的 Git 儲存庫。在這裡加入的市集屬於你個人。啟用的外掛會載入你在本專案以及所有專案的討論串。',
 
 
+
+    /* ---- 目錄的完整分類清單與外掛頁按鈕（v3.17.0）---- */
+    'All categories': '所有分類',
+    'AI models & agents': 'AI 模型與代理',
+    'Customer support': '客戶支援',
+    'Designs & media': '設計與媒體',
+    'Email & messages': '電子郵件與訊息',
+    'Healthcare & life sciences': '醫療與生命科學',
+    'HR': '人力資源',
+    'IT & security': 'IT 與資安',
+    'Learning': '學習',
+    'Logs & errors': '記錄與錯誤',
+    'Media & entertainment': '媒體與娛樂',
+    'Notes & memory': '筆記與記憶',
+    'Product': '產品',
+    'Reference docs': '參考文件',
+    'Retail & e-commerce': '零售與電子商務',
+    'Servers & cloud': '伺服器與雲端',
+    'Shopping': '購物',
+    'Websites': '網站',
+    'Recently added': '最近新增',
+    'Most installed': '最多人安裝',
+    'Change project': '變更專案',
+    'Remove from project': '從專案移除',
+    'Create a plugin': '建立外掛',
+    'Upload plugin': '上傳外掛',
+    'Claude history': 'Claude 歷史紀錄',
+    'Pull requests': '合併請求',
+    /* 外掛的長說明。同樣是第三方填的，改版就失效，見 未採用字串.md。 */
+    'Ask Claude about the contractors you pay through Wingspan, what you owe them, and what is holding up a payment, then onboard contractors and log payments as drafts, with a preview before anything is written. Requires a Wingspan account; bundles the Wingspan MCP server (OAuth on first use).': '向 Claude 詢問你透過 Wingspan 付款的承包商、欠款金額，以及哪筆付款卡住了，接著可以建立承包商資料並把付款記成草稿，寫入之前一律先預覽。需要 Wingspan 帳號；內含 Wingspan MCP 伺服器（首次使用時走 OAuth）。',
+    'Portfolio monitoring and analytics for private-capital LP teams using the Chronograph connector: cashflow forecasting, commitment pacing, look-through exposure scans and GP-meeting prep. Requires a Chronograph account and the Chronograph connector.': '給私募資本 LP 團隊的投資組合監控與分析，透過 Chronograph 連接器：現金流預測、承諾投入節奏、穿透式曝險掃描與 GP 會議準備。需要 Chronograph 帳號與 Chronograph 連接器。',
+    'Portfolio monitoring, valuations and analytics for private-capital GP teams using the Chronograph connector: portfolio-company one-pagers, fund quarterly review packs, markup/markdown briefs, TVPI attribution and budget-vs-actuals. Requires a Chronograph account and the Chronograph connector.': '給私募資本 GP 團隊的投資組合監控、估值與分析，透過 Chronograph 連接器：投資標的一頁式簡介、基金季度檢視資料包、估值調升／調降摘要、TVPI 歸因與預算對實際。需要 Chronograph 帳號與 Chronograph 連接器。',
+    'Prep calls, summarize and follow up, research accounts, review deals and pipeline, and write the forecast, using the CRM, email, calendar and chat tools your team already uses, or uploaded files. Updates records, drafts or sends email, posts to chat and books meetings when you ask.': '用團隊既有的 CRM、電子郵件、行事曆與聊天工具（或上傳的檔案）準備通話、做摘要與後續追蹤、研究客戶、檢視案件與業務管線，並寫出預測。你開口就能更新紀錄、草擬或寄出郵件、發到聊天室並安排會議。',
+    'Social media automation CLI for scheduling posts, managing integrations, uploading media, and tracking analytics across 28+ platforms including X, LinkedIn, Reddit, YouTube, TikTok, Instagram, and more': '社群媒體自動化 CLI，可排程貼文、管理整合、上傳媒體並追蹤成效，涵蓋 X、LinkedIn、Reddit、YouTube、TikTok、Instagram 等 28 種以上平台',
+    'Turn website visitor signals into pipeline with Leadfeeder: daily visitor briefs, visitor company research, buyer and contact discovery, personalised outreach drafts, and adding companies to your Leadfeeder lists, via the Leadfeeder connector. Requires a Leadfeeder account.': '用 Leadfeeder 把網站訪客訊號變成業務管線：每日訪客簡報、訪客公司研究、買方與聯絡人探詢、個人化開發信草稿，以及把公司加進你的 Leadfeeder 名單，透過 Leadfeeder 連接器運作。需要 Leadfeeder 帳號。',
+    'Work with incident.io from Claude: respond to and investigate incidents, check on-call schedules and escalations, and author the runbooks, skills and architecture docs that incident.io investigations draw on. Bundles the official incident.io MCP server (OAuth on first use).': '在 Claude 裡操作 incident.io：應變與調查事故、查看待命排班與升級狀況，並撰寫 incident.io 調查時會參照的操作手冊、技能與架構文件。內含官方 incident.io MCP 伺服器（首次使用時走 OAuth）。',
     /* ---- 連接器與外掛的說明文案（v3.16.0，Harry 指定要翻）。
          這是各家廠商自己填的簡介，他們改一個字條目就失效。只收目錄上實際看過的。 ---- */
     'Accelerate design workflows — critique, design system management, UX writing, accessibility audits, research synthesis, and dev handoff. From exploration to pixel-perfect specs.': '加速設計流程——設計評論、設計系統管理、UX 文案、無障礙稽核、研究整合與交付開發。從發想到精準到像素的規格。',
@@ -1808,10 +1844,18 @@
   const collected = new Set();
   let collectFull = false;
 
+  /* 讀回上次的累積，順便用「現在這一版」的規則重篩一遍。
+     腳本更新後，上一版記下的字串有些已經補進字典、有些已經被過濾掉了，
+     不重篩就會一直留在存檔裡，匯出時看起來像「補了也沒變少」。
+     這是 Harry 連續兩次回報同一批字串的原因（v3.17.0 修）。 */
+  let dropped = 0;
+
   try {
     const saved = JSON.parse(localStorage.getItem(COLLECT_KEY) || '[]');
     if (Array.isArray(saved)) for (const item of saved) {
-      if (typeof item === 'string') collected.add(item);
+      if (typeof item !== 'string') continue;
+      if (stillMissing(item)) collected.add(item);
+      else dropped++;
     }
   } catch (e) { /* 無痕模式、或存檔壞了，就從零開始 */ }
 
@@ -1827,6 +1871,30 @@
   function scheduleSave() {
     if (saveTimer !== null) return;
     saveTimer = setTimeout(saveCollected, 2000);   // 合併連續變動，不要每個字串都寫一次
+  }
+
+  /* 重篩的結果要寫回去，否則下次開啟又從舊存檔讀。
+     這幾行必須排在 scheduleSave 後面：saveTimer 是 let，提前呼叫會踩到 TDZ。 */
+  if (dropped > 0) {
+    console.log(
+      '[zh-tw-webui v' + VERSION + '] 累積清單重新篩過：' + dropped +
+      ' 條在這一版已經處理掉了，剩 ' + collected.size + ' 條。'
+    );
+    scheduleSave();
+  }
+
+  /* 「這條字串照現在這一版的規則，仍然算漏翻嗎」。
+     讀回存檔時用它重篩，recordMiss() 也用同一套判斷，兩邊才不會各說各話。
+     一律以 normalize 後的 key 判斷，原因見 README 第 6.5 段。 */
+  function stillMissing(raw) {
+    if (!raw || !looksTranslatable(raw)) return false;
+    const key = normalize(raw);
+    if (!key) return false;
+    if (looksLikeData(key)) return false;
+    if (ATTR_ONLY.has(key)) return false;
+    if (NEVER.has(key)) return false;
+    if (translateString(key, true)) return false;   // 這一版已經翻得出來了
+    return true;
   }
 
   /* 翻譯流程走到「查不到對應」時呼叫。這裡不再查字典，因為呼叫端已經查過了。 */
