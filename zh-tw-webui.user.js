@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         繁體中文介面（Claude + GitHub） v3.23.0
-// @name:zh-TW   繁體中文介面（Claude + GitHub） v3.23.0
+// @name         繁體中文介面（Claude + GitHub） v3.24.0
+// @name:zh-TW   繁體中文介面（Claude + GitHub） v3.24.0
 // @namespace    https://github.com/b010203044-code/zh-tw-webui
-// @version      3.23.0
+// @version      3.24.0
 // @description  把 claude.ai 與 github.com 的「介面文字」換成繁體中文（台灣用語）。只翻譯介面，絕不更動對話內容、程式碼、檔名、議題內文等使用者資料。
 // @author       Harry
 // @match        https://claude.ai/*
@@ -19,7 +19,7 @@
 
   /* 版本號。改版時四個地方要一起改：@name、@name:zh-TW、@version、這裡。
      @name 帶版本號是為了在油猴控制台與動作選單上一眼看得出跑的是哪一版。 */
-  const VERSION = '3.23.0';
+  const VERSION = '3.24.0';
 
   /* ------------------------------------------------------------------ *
    * 1. 共用保護區：所有站台都不動這些地方的文字
@@ -148,6 +148,45 @@
                  For complex tasks…）。整句字典早在 v3.22.0 就收了，碎片拼不回語順。 */
               'as', 'complex', 'everyday', 'for quick', 'found', 'pick the', 'toughest',
               'your', 'usage'],
+
+      /* 斜線選單的「原文(翻譯)」（v3.24.0，Harry 要求）。
+         在輸入框打 / 跳出的指令與技能選單裡，指令名本身是要打出來用的代號，
+         不能換掉，所以原文一個字都不動，只用 CSS ::after 在後面補一段灰色譯文：
+         dataviz → dataviz(資料視覺化)。譯文不是真的文字，複製、篩選、執行都不受影響。
+         只在 glossScope 裡生效，而且文字必須跟下面的鍵一模一樣才補。 */
+      glossScope: '[role="option"], [role="menuitem"], [cmdk-item]',
+      gloss: {
+        /* 內建指令 */
+        'add-dir': '加入資料夾', 'agents': '代理', 'bug': '回報問題', 'clear': '清空對話',
+        'compact': '壓縮對話', 'config': '設定', 'context': '上下文', 'cost': '花費',
+        'doctor': '檢查環境', 'exit': '離開', 'export': '匯出', 'help': '說明',
+        'hooks': '掛鉤', 'init': '初始化', 'login': '登入', 'logout': '登出',
+        'mcp': 'MCP 伺服器', 'memory': '記憶', 'model': '模型', 'permissions': '權限',
+        'plugin': '外掛', 'plugins': '外掛', 'pr-comments': 'PR 留言',
+        'release-notes': '版本資訊', 'resume': '接續對話', 'review': '程式碼審查',
+        'rewind': '倒回', 'status': '狀態', 'statusline': '狀態列',
+        'terminal-setup': '終端機設定', 'todos': '待辦', 'upgrade': '升級',
+        'usage': '用量', 'verify': '驗證', 'vim': 'Vim 模式', 'skills': '技能',
+        'loop': '定時重複', 'run': '執行應用程式', 'simplify': '簡化程式碼',
+        'code-review': '程式碼審查', 'security-review': '安全性審查',
+        /* 技能 */
+        'session-start-hook': '工作階段啟動掛鉤', 'design': '設計', 'slides': '投影片',
+        'design-sync': '設計同步', 'dataviz': '資料視覺化',
+        'artifact-design': '作品設計', 'artifact-diagramming': '作品圖表',
+        'artifact-capabilities': '作品功能', 'update-config': '更新設定',
+        'keybindings-help': '快捷鍵說明', 'fewer-permission-prompts': '減少權限詢問',
+        'claude-api': 'Claude API', 'docs': '文件', 'pdf': 'PDF', 'docx': 'Word 文件',
+        'xlsx': 'Excel 試算表', 'pptx': 'PowerPoint 簡報',
+        'algorithmic-art': '演算法藝術', 'brand-guidelines': '品牌規範',
+        'canvas-design': '畫布設計', 'deep-research': '深度研究',
+        'doc-coauthoring': '文件共筆', 'import-memory': '匯入記憶',
+        'internal-comms': '內部溝通', 'mcp-builder': 'MCP 建置',
+        'skill-creator': '技能建立', 'slack-gif-creator': 'Slack GIF 製作',
+        'theme-factory': '主題工坊', 'web-artifacts-builder': '網頁作品建置',
+        'google-workspace': 'Google 工作區', 'morning': '晨間簡報',
+        'cat-grid-color-solver': '貓咪方格顏色判讀', 'cat-grid-puzzle-solver': '貓咪方格解謎',
+        'recipe-rainbow-island': '彩虹島食譜'
+      },
 
       dict: {
     /* ---- 側邊欄與導覽 ---- */
@@ -1182,6 +1221,7 @@
     'Created by': '建立者',
     'Create a skill': '建立技能',
     'Upload skill': '上傳技能',
+    'Type to filter': '輸入以篩選',
     'Expand table': '展開表格',
     /* 側邊欄與檢視 */
     'Edit sidebar': '編輯側邊欄',
@@ -1922,6 +1962,10 @@
   // 刻意不翻也不回報的字串（產品名、按鍵名…）。只影響盤點與累積，不影響翻譯。
   const NEVER = new Set((site.never || []).map(normalize));
 
+  // 斜線選單的譯文附註（v3.24.0）。鍵本身是指令代號，也不要再回報成漏翻。
+  const GLOSS = new Map(Object.entries(site.gloss || {}));
+  for (const k of GLOSS.keys()) NEVER.add(k);
+
   function normalize(s) {
     return s
       .replace(/ /g, ' ')
@@ -2190,6 +2234,8 @@
     const parent = node.parentElement;
     if (!parent || isProtected(parent)) return;
 
+    if (GLOSS.size && glossNode(node, parent)) return;
+
     const translated = translateString(raw, false);
     if (!translated) { recordMiss(raw, false); return; }
 
@@ -2200,6 +2246,29 @@
     if (next === raw) return;
     node.nodeValue = next;
     written.set(node, next);
+  }
+
+  /* 斜線選單：文字原封不動，只在父元素掛 data-zh-gloss，由 CSS ::after 顯示譯文。
+     父元素裡只能有這段文字，免得把譯文接在一整句話後面。 */
+  function glossNode(node, parent) {
+    const key = normalize(node.nodeValue);
+    const zh = GLOSS.get(key);
+    if (!zh || !site.glossScope || !parent.closest(site.glossScope)) return false;
+    if (normalize(parent.textContent) !== key) return false;
+    if (parent.getAttribute('data-zh-gloss') !== zh) parent.setAttribute('data-zh-gloss', zh);
+    ensureGlossStyle();
+    return true;
+  }
+
+  let glossStyled = false;
+  function ensureGlossStyle() {
+    if (glossStyled) return;
+    glossStyled = true;
+    const st = document.createElement('style');
+    st.id = 'zh-tw-webui-gloss';
+    st.textContent = '[data-zh-gloss]::after{content:"(" attr(data-zh-gloss) ")";' +
+                     'opacity:.6;margin-left:.15em;font-weight:normal}';
+    (document.head || document.documentElement).appendChild(st);
   }
 
   function translateAttributes(el) {

@@ -1,10 +1,10 @@
 # 繁體中文介面（Claude + GitHub）
 
-腳本檔：`zh-tw-webui.user.js`（v3.23.0）
+腳本檔：`zh-tw-webui.user.js`（v3.24.0）
 安裝連結：[zh-tw-webui.user.js](https://raw.githubusercontent.com/b010203044-code/zh-tw-webui/main/zh-tw-webui.user.js)（Tampermonkey 裝好後點這個連結會直接跳出安裝畫面）
 用途：把 **claude.ai** 和 **github.com** 的介面文字換成繁體中文（台灣用語），不動你的對話內容、程式碼、檔名、議題內文等使用者資料。
 
-字典規模：claude.ai 972 條 + 109 條規則；github.com 360 條 + 30 條規則。
+字典規模：claude.ai 973 條 + 109 條規則 + 斜線選單 75 個附註；github.com 360 條 + 30 條規則。
 未採用的字串與原因整理在 [未採用字串.md](未採用字串.md)。
 
 > GitHub 網頁介面目前沒有官方的中文選項（使用者社群還在許願階段），所以只能靠腳本翻。claude.ai 也沒有。
@@ -219,6 +219,11 @@ attrOnly: ['App', 'Other', 'Kind', 'Size', 'Goal', 'Grid', 'List', 'Extra', 'Inp
 
 - `written`（`WeakMap`）：記下我們寫進去的值。React 重繪時內容沒變就不重做，避免和框架互相打架。
 - `translateTextNode()`：替換時**保留原本的前後空白**，不然版面間距會跑掉。
+- `glossNode()`（v3.24.0）：斜線選單（輸入框打 `/` 跳出來的指令與技能）顯示成「原文(翻譯)」，例如 `dataviz(資料視覺化)`。
+  指令名是要打出來用的代號，所以**文字本身一個字都不改**，只在外層元素掛 `data-zh-gloss`，
+  再由 CSS `::after` 補一段灰色譯文。譯文不是真的文字，複製、篩選、執行都不受影響。
+  只在 `glossScope`（選單項目）裡、而且文字跟 `gloss` 清單的鍵完全相同時才補；自己寫的技能不在清單裡就維持原樣，
+  要加就在 `claude` 站台的 `gloss` 補一行 `'技能代號': '譯名'`。
 - `translateSubtree()`：用 `TreeWalker` 走整棵樹，碰到保護區的元素直接 `FILTER_REJECT`，整段剪掉不進去看。屬性則是整棵樹都掃——因為 `aria-label` / `title` 一定是介面字串，不可能是使用者寫的內容。
 
 ### 第 5 段：監看 DOM 變動（搜尋 `* 5.`）
