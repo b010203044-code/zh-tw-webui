@@ -1,10 +1,10 @@
 # 繁體中文介面（Claude + GitHub）
 
-腳本檔：`zh-tw-webui.user.js`（v3.22.0）
+腳本檔：`zh-tw-webui.user.js`（v3.23.0）
 安裝連結：[zh-tw-webui.user.js](https://raw.githubusercontent.com/b010203044-code/zh-tw-webui/main/zh-tw-webui.user.js)（Tampermonkey 裝好後點這個連結會直接跳出安裝畫面）
 用途：把 **claude.ai** 和 **github.com** 的介面文字換成繁體中文（台灣用語），不動你的對話內容、程式碼、檔名、議題內文等使用者資料。
 
-字典規模：claude.ai 916 條 + 105 條規則；github.com 360 條 + 30 條規則。
+字典規模：claude.ai 972 條 + 109 條規則；github.com 360 條 + 30 條規則。
 未採用的字串與原因整理在 [未採用字串.md](未採用字串.md)。
 
 > GitHub 網頁介面目前沒有官方的中文選項（使用者社群還在許願階段），所以只能靠腳本翻。claude.ai 也沒有。

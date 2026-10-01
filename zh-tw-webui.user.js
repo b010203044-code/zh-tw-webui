@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         繁體中文介面（Claude + GitHub） v3.22.0
-// @name:zh-TW   繁體中文介面（Claude + GitHub） v3.22.0
+// @name         繁體中文介面（Claude + GitHub） v3.23.0
+// @name:zh-TW   繁體中文介面（Claude + GitHub） v3.23.0
 // @namespace    https://github.com/b010203044-code/zh-tw-webui
-// @version      3.22.0
+// @version      3.23.0
 // @description  把 claude.ai 與 github.com 的「介面文字」換成繁體中文（台灣用語）。只翻譯介面，絕不更動對話內容、程式碼、檔名、議題內文等使用者資料。
 // @author       Harry
 // @match        https://claude.ai/*
@@ -19,7 +19,7 @@
 
   /* 版本號。改版時四個地方要一起改：@name、@name:zh-TW、@version、這裡。
      @name 帶版本號是為了在油猴控制台與動作選單上一眼看得出跑的是哪一版。 */
-  const VERSION = '3.22.0';
+  const VERSION = '3.23.0';
 
   /* ------------------------------------------------------------------ *
    * 1. 共用保護區：所有站台都不動這些地方的文字
@@ -135,7 +135,19 @@
               'Adobe for creativity', 'S&P - Deterministic Retrieval', 'Apollo.io', 'Windsor.ai',
               /* v3.19.0：「Drag to pin」「Release to unpin」被 DOM 切成兩半的碎片。
                  整串版本字典早就收了，碎片拼不回正確語順，也不要再回報。 */
-              'Drag', 'Drag to', 'to pin', 'to unpin', 'pin', 'Release'],
+              'Drag', 'Drag to', 'to pin', 'to unpin', 'pin', 'Release',
+              /* v3.23.0：外掛、技能與連接器的名稱。同上，列在這裡也讓 known() 認得，
+                 「View Todoist」才會變成「查看 Todoist」、「Turn off google-workspace」
+                 變成「關閉 google-workspace」。 */
+              'ANcpLua Lean Proof', 'Crypto Spot Futures Analyzer', 'lesslop', 'LR-AI',
+              'octopus-ai', 'cat-grid-color-solver', 'cat-grid-puzzle-solver', 'google-workspace',
+              'Cloudflare Developer Platform', 'Firecrawl', 'GitHub Integration', 'Intercom',
+              'Mem', 'TickTick', 'Todoist', 'Trello', 'Wix', 'WordPress.com', 'Claude Academy',
+              'Claude Platform', 'on Claude Platform',
+              /* v3.23.0：模型選單說明被 DOM 切開的碎片（For your toughest challenges、
+                 For complex tasks…）。整句字典早在 v3.22.0 就收了，碎片拼不回語順。 */
+              'as', 'complex', 'everyday', 'for quick', 'found', 'pick the', 'toughest',
+              'your', 'usage'],
 
       dict: {
     /* ---- 側邊欄與導覽 ---- */
@@ -1146,6 +1158,74 @@
     'Posting a message': '張貼訊息中',
     'Editing a file': '編輯檔案中',
     'Creating a file': '建立檔案中',
+
+    /* ---- 第十七批（v3.23.0）：外掛目錄分類、側邊欄、專案時間軸、頁尾連結 ---- */
+    /* 目錄分類，風險同 v3.15.0 那批：使用者的專案剛好同名時會被改到 */
+    'Books': '書籍',
+    'Dependencies & packages': '相依項目與套件',
+    'Events': '活動',
+    'Family & relationships': '家庭與人際關係',
+    'Food': '美食',
+    'Games': '遊戲',
+    'Government': '政府',
+    'Health & fitness': '健康與健身',
+    'Jobs & career': '工作與職涯',
+    'Marketing analytics': '行銷分析',
+    'Music': '音樂',
+    'Personal finance': '個人理財',
+    'Puzzles': '益智遊戲',
+    'Web': '網頁',
+    'Writing': '寫作',
+    'Claude settings': 'Claude 設定',
+    'Connector': '連接器',
+    'Anthropic Directory': 'Anthropic 目錄',
+    'Created by': '建立者',
+    'Create a skill': '建立技能',
+    'Upload skill': '上傳技能',
+    'Expand table': '展開表格',
+    /* 側邊欄與檢視 */
+    'Edit sidebar': '編輯側邊欄',
+    'Choose which items appear in your sidebar.': '選擇要在側邊欄顯示哪些項目。',
+    'Show fewer': '顯示較少',
+    'Group and sort': '分組與排序',
+    'View options': '檢視選項',
+    'Views': '檢視',
+    'Unread messages': '未讀訊息',
+    'Loading session': '正在載入工作階段',
+    /* 專案時間軸與討論串 */
+    'Completed threads.': '已完成的討論串。',
+    'Decisions, reviews, and permission requests.': '決策、審查與權限請求。',
+    'Message received from another thread': '收到來自其他討論串的訊息',
+    'Sent to a thread': '已送到討論串',
+    'Projects now come with Claude built in': '專案現在內建 Claude',
+    'This thread is resolved.': '此討論串已解決。',
+    'Reopen': '重新開啟',
+    'Reopen it to send more messages.': '重新開啟後即可傳送更多訊息。',
+    'Resolved, reopen thread': '已解決，重新開啟討論串',
+    'Reconnect': '重新連接',
+    'You': '你',
+    'Your organization': '你的組織',
+    /* 帳號選單與頁尾連結 */
+    'About Anthropic': '關於 Anthropic',
+    'Get API keys': '取得 API 金鑰',
+    'Get help': '取得協助',
+    'Keyboard shortcuts': '鍵盤快捷鍵',
+    'Share guest passes': '分享訪客通行證',
+    'Privacy policy': '隱私權政策',
+    'Terms of service': '服務條款',
+    'Usage policy': '使用政策',
+    'Your privacy choices': '你的隱私選擇',
+    /* 外掛說明文案（照 v3.16.0 的決定一併翻） */
+    'Analyze crypto spot and futures trades, TradingView screenshots, BTC/ETH/altcoin setups, entries, stops, targets, leverage, liquidation risk, technical analysis, risk/reward, position sizing, funding, open interest, DCA and portfolio risk.':
+      '分析加密貨幣現貨與期貨交易、TradingView 截圖、BTC/ETH/山寨幣的交易布局、進場、停損、目標價、槓桿、清算風險、技術分析、風險報酬比、部位大小、資金費率、未平倉量、定期定額與投資組合風險。',
+    'Automated literature reviews: seed search, database keyword search, forward/backward snowballing, deduplication, filtering, LLM screening and categorization, exported as a styled Google Sheet (via Composio) and Excel file.':
+      '自動化文獻回顧：種子搜尋、資料庫關鍵字搜尋、向前／向後滾雪球檢索、去除重複、篩選、LLM 篩檢與分類，匯出成套好樣式的 Google 試算表（透過 Composio）與 Excel 檔。',
+    'Connects to Octopus AI and adds FP&A workflows: multi-version comparison reporting, dimension-grouped forecast quality scoring, and root-cause variance investigation, exported as branded report Artifacts. Also exposes direct read-only tools for dimensions/hierarchies, preferences, organization domain, org-memory search, plan/transaction data, and messaging.':
+      '連接 Octopus AI 並加入 FP&A 工作流程：多版本比較報表、依維度分組的預測品質評分，以及差異的根因調查，匯出成帶品牌樣式的報告作品。另外提供直接的唯讀工具，可查詢維度／階層、偏好設定、組織網域、組織記憶搜尋、計畫／交易資料與訊息。',
+    'Labels every claim as [proof: . . . ] or {unverified}. Fires on every prompt.':
+      '把每一項主張標成 [proof: . . . ] 或 {unverified}。每次送出提示都會觸發。',
+    'Prove C#/.NET state machines correct with Lean 4 and turn every counterexample into a reproduced, fixed bug.':
+      '用 Lean 4 證明 C#/.NET 狀態機正確，並把每個反例都變成已重現、已修正的錯誤。',
     /* 下面五個同時列在 attrOnly：只有 aria-label / title 會翻，畫面文字不碰 */
     'Date': '日期',
     'State': '狀態',
@@ -1207,6 +1287,27 @@
     [/^Up late, ([^?]{1,40})\?$/, (m) => '還沒睡嗎，' + m[1] + '？'],
     [/^(Good morning|Good afternoon|Good evening), (.{1,40})$/,
       (m) => { const t = known(m[1]); return t ? t + '，' + m[2] : null; }],
+
+    /* 側邊欄問候（v3.23.0）。名字原樣帶過去。 */
+    [/^Welcome back, ([^.]{1,40})\.$/, (m) => '歡迎回來，' + m[1] + '。'],
+
+    /* 外掛卡片的分類列與作者（v3.23.0）。
+       「Categories: Games, Designs & media, and Puzzles」每個分類都查得到才翻。 */
+    [/^Categories: (.+)$/, (m) => {
+      const out = [];
+      for (const part of m[1].split(/, and |, | and /)) {
+        const t = LOOKUP.get(normalize(part));
+        if (!t) return null;
+        out.push(t);
+      }
+      return '分類：' + out.join('、');
+    }],
+    /* 後面是作者名，原樣帶過去。限定大寫開頭的一到五個字，免得吃到一般句子。 */
+    [/^by ([A-Z][\w.&'-]*(?: [A-Z][\w.&'-]*){0,4})$/, (m) => '由 ' + m[1] + ' 提供'],
+
+    /* 專案總覽的每日討論串圖表（v3.23.0）。日期照政策維持英文，只翻「N threads」與 Today。 */
+    [/^(?:(?:[A-Z][a-z]{2} \d{1,2}|Today): \d+ threads?(?:, |$))+$/,
+      (m) => m[0].replace(/(\d+) threads?/g, '$1 個討論串').replace(/\bToday\b/g, '今天').replace(/, /g, '，')],
 
     /* 用量的 5 小時上限 */
     [/^(\d+)% of 5-hour limit used\.$/, (m) => '已使用 5 小時上限的 ' + m[1] + '%。'],
