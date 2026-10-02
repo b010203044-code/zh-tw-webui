@@ -1,10 +1,10 @@
 # 繁體中文介面（Claude + GitHub）
 
-腳本檔：`zh-tw-webui.user.js`（v3.24.0）
+腳本檔：`zh-tw-webui.user.js`（v3.25.0）
 安裝連結：[zh-tw-webui.user.js](https://raw.githubusercontent.com/b010203044-code/zh-tw-webui/main/zh-tw-webui.user.js)（Tampermonkey 裝好後點這個連結會直接跳出安裝畫面）
 用途：把 **claude.ai** 和 **github.com** 的介面文字換成繁體中文（台灣用語），不動你的對話內容、程式碼、檔名、議題內文等使用者資料。
 
-字典規模：claude.ai 973 條 + 109 條規則 + 斜線選單 75 個附註；github.com 360 條 + 30 條規則。
+字典規模：claude.ai 1084 條 + 118 條規則 + 斜線選單 102 個附註；github.com 360 條 + 30 條規則。
 未採用的字串與原因整理在 [未採用字串.md](未採用字串.md)。
 
 > GitHub 網頁介面目前沒有官方的中文選項（使用者社群還在許願階段），所以只能靠腳本翻。claude.ai 也沒有。
@@ -224,6 +224,7 @@ attrOnly: ['App', 'Other', 'Kind', 'Size', 'Goal', 'Grid', 'List', 'Extra', 'Inp
   再由 CSS `::after` 補一段灰色譯文。譯文不是真的文字，複製、篩選、執行都不受影響。
   只在 `glossScope`（選單項目）裡、而且文字跟 `gloss` 清單的鍵完全相同時才補；自己寫的技能不在清單裡就維持原樣，
   要加就在 `claude` 站台的 `gloss` 補一行 `'技能代號': '譯名'`。
+  外掛附帶的技能會帶前綴（`anthropic-skills:docx`），v3.25.0 起查表時會去掉前綴，所以只要收 `docx` 一條就好。
 - `translateSubtree()`：用 `TreeWalker` 走整棵樹，碰到保護區的元素直接 `FILTER_REJECT`，整段剪掉不進去看。屬性則是整棵樹都掃——因為 `aria-label` / `title` 一定是介面字串，不可能是使用者寫的內容。
 
 ### 第 5 段：監看 DOM 變動（搜尋 `* 5.`）

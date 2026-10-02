@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         繁體中文介面（Claude + GitHub） v3.24.0
-// @name:zh-TW   繁體中文介面（Claude + GitHub） v3.24.0
+// @name         繁體中文介面（Claude + GitHub） v3.25.0
+// @name:zh-TW   繁體中文介面（Claude + GitHub） v3.25.0
 // @namespace    https://github.com/b010203044-code/zh-tw-webui
-// @version      3.24.0
+// @version      3.25.0
 // @description  把 claude.ai 與 github.com 的「介面文字」換成繁體中文（台灣用語）。只翻譯介面，絕不更動對話內容、程式碼、檔名、議題內文等使用者資料。
 // @author       Harry
 // @match        https://claude.ai/*
@@ -19,7 +19,7 @@
 
   /* 版本號。改版時四個地方要一起改：@name、@name:zh-TW、@version、這裡。
      @name 帶版本號是為了在油猴控制台與動作選單上一眼看得出跑的是哪一版。 */
-  const VERSION = '3.24.0';
+  const VERSION = '3.25.0';
 
   /* ------------------------------------------------------------------ *
    * 1. 共用保護區：所有站台都不動這些地方的文字
@@ -147,7 +147,17 @@
               /* v3.23.0：模型選單說明被 DOM 切開的碎片（For your toughest challenges、
                  For complex tasks…）。整句字典早在 v3.22.0 就收了，碎片拼不回語順。 */
               'as', 'complex', 'everyday', 'for quick', 'found', 'pick the', 'toughest',
-              'your', 'usage'],
+              'your', 'usage',
+              /* v3.25.0：新出現的外掛、連接器與產品名，以及載入動畫動詞。 */
+              'Anomity', 'Docbrain', 'PII Scan', 'pipe0', 'Seudonimizador Clinico Juridico',
+              'Claude Design', 'Claude Docs', 'Claude Slides', 'Google Docs', 'Google Sheets',
+              'Google Slides', 'Sonnet 5.5', 'Cogitating', 'Figuring', 'Warming',
+              /* 被 DOM 切開的碎片與分支名。前後文拼不回整句，不要再回報。 */
+              ', downloads the Claude desktop app', ', environment settings, right arrow',
+              'on your machine to code from here.', 'path with', 'the', 'up',
+              'first item', 'second item', 'master',
+              /* 那支外掛的說明本來就是西班牙文，不是英文介面，不翻 */
+              'Seudonimiza casos clínicos y jurídicos para estudio, supervisión o formación: conserva la utilidad analítica y elimina identificadores directos, reduciendo los indirectos hasta un nivel auditado. Cuatro modos (clínico, jurídico, generalización extrema y auditoría). No sustituye la anonimización formal que exigen el RGPD y la LOPDGDD.'],
 
       /* 斜線選單的「原文(翻譯)」（v3.24.0，Harry 要求）。
          在輸入框打 / 跳出的指令與技能選單裡，指令名本身是要打出來用的代號，
@@ -185,7 +195,18 @@
         'theme-factory': '主題工坊', 'web-artifacts-builder': '網頁作品建置',
         'google-workspace': 'Google 工作區', 'morning': '晨間簡報',
         'cat-grid-color-solver': '貓咪方格顏色判讀', 'cat-grid-puzzle-solver': '貓咪方格解謎',
-        'recipe-rainbow-island': '彩虹島食譜'
+        'recipe-rainbow-island': '彩虹島食譜',
+        /* v3.25.0：第十八批在選單裡看到的 */
+        'advisor': '顧問', 'autocompact': '自動壓縮', 'batch': '批次處理', 'debug': '除錯',
+        'effort': '投入程度', 'fast': '快速模式', 'goal': '目標', 'heapdump': '記憶體傾印',
+        'import': '匯入', 'insights': '使用分析', 'list-agents': '列出代理',
+        'output-style': '輸出風格', 'reload-skills': '重新載入技能', 'rename': '重新命名',
+        'reply': '回覆', 'run-skill-generator': '執行技能產生器', 'skill-doctor': '技能健檢',
+        'team-onboarding': '團隊新手上路', 'workflow-launch-exec': '啟動工作流程',
+        '__remote-workflow': '遠端工作流程', 'design-consent': '設計授權同意',
+        'design-revoke': '撤銷設計授權', 'claude-code-mini-course': 'Claude Code 迷你課程',
+        'built-in-browser': '內建瀏覽器', 'chrome-browser': 'Chrome 瀏覽器',
+        'computer-use': '電腦操作'
       },
 
       dict: {
@@ -1266,6 +1287,119 @@
       '把每一項主張標成 [proof: . . . ] 或 {unverified}。每次送出提示都會觸發。',
     'Prove C#/.NET state machines correct with Lean 4 and turn every counterexample into a reproduced, fixed bug.':
       '用 Lean 4 證明 C#/.NET 狀態機正確，並把每個反例都變成已重現、已修正的錯誤。',
+    /* v3.25.0（第十八批）：例行任務、工作階段、專案升級、遠端控制、模型與外掛說明 */
+    'A deck you can present, restyle with a design system and export to PowerPoint.': '可以直接簡報、套用設計系統換風格，並匯出成 PowerPoint 的投影片。',
+    'By Anthropic': '由 Anthropic 提供',
+    'By Anthropic. A deck you can present, restyle with a design system and export to PowerPoint.': '由 Anthropic 提供。可以直接簡報、套用設計系統換風格，並匯出成 PowerPoint 的投影片。',
+    'By Anthropic. A document your team reads, comments on and edits in place while Claude keeps it current.': '由 Anthropic 提供。團隊可以直接閱讀、留言與編輯的文件，由 Claude 隨時保持最新。',
+    'By Anthropic. Screens, flows and graphics laid out as artboards on one canvas you can edit by hand.': '由 Anthropic 提供。把畫面、流程與圖像排成畫板放在同一張畫布上，也能自己動手編輯。',
+    'Add cloud environment…': '新增雲端環境…',
+    'Add files or photos': '新增檔案或照片',
+    'API performance': 'API 效能',
+    "Ask Claude about your fleet's AI security posture through the Anomity connector: findings, MCP servers, shadow AI accounts, exposed secrets, compliance readiness and allowlist suggestions. Skills turn the answers into posture briefings, finding triage, device investigations and allowlist reviews.": '透過 Anomity 連接器向 Claude 詢問你所有裝置的 AI 資安狀況：發現的問題、MCP 伺服器、影子 AI 帳號、外洩的密鑰、合規準備度與允許清單建議。技能會把答案整理成資安狀況簡報、問題分級、裝置調查與允許清單審查。',
+    'Auto-disabled': '已自動停用',
+    'Awaiting input': '等待輸入',
+    "Before you continue, upgrade your existing projects or archive the ones you don't need.": '繼續之前，請升級現有的專案，或封存不需要的專案。',
+    'Briefing': '簡報摘要',
+    'Browse skills': '瀏覽技能',
+    'Browser use': '瀏覽器操作',
+    "Can't use apps on your computer.": '無法使用你電腦上的應用程式。',
+    "Can't use your browser or sites you're signed into.": '無法使用你的瀏覽器，或你已登入的網站。',
+    'Categorize and prioritize your inbox, with draft responses for urgent items.': '為收件匣分類並排定優先順序，緊急的信件附上回覆草稿。',
+    'Chat': '交談',
+    'Claude is thinking': 'Claude 思考中',
+    'Cloud': '雲端',
+    'Local': '本機',
+    'Computer actions available — press Tab until focus enters the card, Escape to return.': '可使用電腦操作 — 按 Tab 直到焦點進入卡片，按 Escape 返回。',
+    'Computer use': '電腦操作',
+    'Connecting…': '連線中…',
+    'Content': '內容',
+    'Created': '已建立',
+    'Custom command': '自訂指令',
+    'Delete session?': '要刪除工作階段嗎？',
+    'Dependency update check': '相依套件更新檢查',
+    'Describe a task or ask a question': '描述一項任務或提出問題',
+    'Design system': '設計系統',
+    'Desktop only': '僅限桌面版',
+    'Desktop, Connected': '桌面，已連線',
+    'Devices': '裝置',
+    'Mobile': '行動裝置',
+    'Dismiss session': '移除工作階段',
+    "DocBrain for coding agents: capture what a conversation worked out into your organization's knowledge, with the file it concerns and the facts it rests on, after one yes.": '給程式設計代理用的 DocBrain：只要你點頭一次，就把一段對話討論出來的結論，連同相關檔案與依據的事實，收進組織的知識庫。',
+    'Draft user-facing release notes each time a PR merges to the main branch.': '每次有 PR 合併進 main 分支時，草擬給使用者看的版本資訊。',
+    'Email triage': '郵件分類',
+    'Filter routines': '篩選例行任務',
+    'Find tests that pass and fail intermittently across recent CI runs.': '從最近幾次 CI 執行中，找出時好時壞的測試。',
+    'Find the personal information in a document before you share it. Reports what is there and where, never the values themselves.': '分享文件前先找出裡面的個人資料。只回報有哪些、在哪裡，絕不顯示資料本身。',
+    'Flaky test tracker': '不穩定測試追蹤',
+    'For complex work and everyday tasks': '適合複雜工作與日常任務',
+    'Forwarded by coordinator': '由協調者轉送',
+    'GTM data for agents. Build and enrich lead lists, watch for buying signals like job changes and hiring.': '給代理用的市場推廣資料。建立並充實潛在客戶名單，留意職務異動、徵才這類購買訊號。',
+    "I don't want to risk losing my old projects": '我不想冒險弄丟舊專案',
+    'I plan on doing it later': '我打算之後再做',
+    "I'm not sure what carries over and what doesn't": '我不確定哪些會保留、哪些不會',
+    "I'm still working in my old projects and don't want to be disrupted": '我還在舊專案裡工作，不想被打斷',
+    'Include completed': '包含已完成',
+    'Issue triage': '議題分類',
+    'List view': '清單檢視',
+    'Loading skill': '正在載入技能',
+    'Manage MCP connectors': '管理 MCP 連接器',
+    'Manage skills': '管理技能',
+    'Message received from coordinator': '已收到協調者的訊息',
+    'Monitor infrastructure and services for errors, outages, and performance issues.': '監控基礎架構與服務的錯誤、中斷與效能問題。',
+    'Most efficient for simpler tasks': '處理較簡單的任務時最有效率',
+    'My old projects are fine as they are': '我的舊專案維持現狀就好',
+    'Needs input': '需要輸入',
+    'New chat, rename session': '新交談，重新命名工作階段',
+    'New chat, rename session, rename available once the chat has loaded': '新交談，重新命名工作階段，交談載入後即可重新命名',
+    'New Projects are missing something I need': '新版專案缺少我需要的功能',
+    'New routine': '新增例行任務',
+    'Next run': '下次執行',
+    'No routines yet.': '還沒有例行任務。',
+    'Not available yet': '尚未提供',
+    'Not now': '現在不要',
+    'Not upgrading right now?': '現在先不升級嗎？',
+    'On hold': '擱置中',
+    'Paused': '已暫停',
+    'One-time': '單次',
+    'Recurring': '重複執行',
+    'Overview of open PRs, review status, and what needs attention.': '開啟中 PR 的總覽、審查狀態，以及需要處理的事項。',
+    "Past chats don't show inside projects yet. Their context is kept.": '過去的交談目前還不會顯示在專案裡，但上下文會保留。',
+    'PR review digest': 'PR 審查摘要',
+    'Refresh list': '重新整理清單',
+    'Release notes drafter': '版本資訊草擬',
+    'Remote Control': '遠端控制',
+    'Set up Remote Control': '設定遠端控制',
+    'Review and categorize incoming issues, bugs, and feature requests.': '審閱並分類新進的議題、錯誤回報與功能請求。',
+    'Routines view': '例行任務檢視',
+    'Run': '執行',
+    'Running skill': '正在執行技能',
+    'Scan for outdated packages, security patches, and breaking changes.': '掃描過時的套件、安全性修補與不相容的變更。',
+    'Schedule': '排程',
+    'Search branches…': '搜尋分支…',
+    'Search repositories…': '搜尋儲存庫…',
+    'Search routines': '搜尋例行任務',
+    'Searched past chats': '已搜尋過去的交談',
+    'Searching past chats': '正在搜尋過去的交談',
+    'Session deleted': '已刪除工作階段',
+    'Sessions': '工作階段',
+    'Sonnet 5.5 is faster and excels at well-scoped tasks.': 'Sonnet 5.5 速度較快，擅長範圍明確的任務。',
+    'Sort routines': '排序例行任務',
+    'Sports': '運動',
+    'Summary of your calendar, emails, and messages.': '你的行事曆、電子郵件與訊息摘要。',
+    'System health check': '系統健康檢查',
+    'Task': '任務',
+    'Tell us why. It helps us improve the upgrade.': '告訴我們原因，這能幫助我們改善升級流程。',
+    'Templates': '範本',
+    "This session will be permanently deleted. This can't be undone.": '此工作階段將永久刪除，而且無法復原。',
+    'Travel & hospitality': '旅遊與餐旅',
+    'Triggered by pull request closed': '在合併請求關閉時觸發',
+    'Troubleshoot GitHub connection': '排解 GitHub 連線問題',
+    'Try it': '試試看',
+    'Update': '更新',
+    'Update skill': '更新技能',
+    'Upgrade your projects': '升級你的專案',
+    'Where Claude runs': 'Claude 的執行位置',
     /* 下面五個同時列在 attrOnly：只有 aria-label / title 會翻，畫面文字不碰 */
     'Date': '日期',
     'State': '狀態',
@@ -1329,7 +1463,22 @@
       (m) => { const t = known(m[1]); return t ? t + '，' + m[2] : null; }],
 
     /* 側邊欄問候（v3.23.0）。名字原樣帶過去。 */
-    [/^Welcome back, ([^.]{1,40})\.$/, (m) => '歡迎回來，' + m[1] + '。'],
+    [/^Welcome back, ([^.]{1,40})(\.?)$/, (m) => '歡迎回來，' + m[1] + (m[2] ? '。' : '')],
+
+    /* v3.25.0。名字是使用者自己的專案名，原樣帶過去。 */
+    [/^Open project (.{1,80})$/, (m) => '開啟專案 ' + m[1]],
+    [/^Toggle threads for (.{1,80})$/, (m) => '展開或收合 ' + m[1] + ' 的討論串'],
+    [/^Skills: (.+)$/, (m) => '技能：' + m[1]],
+    [/^Replaces your current (\/\S+)$/, (m) => '會取代你目前的 ' + m[1]],
+    [/^Upgrade (\d+) projects?$/, (m) => '升級 ' + m[1] + ' 個專案'],
+    [/^Show (\d+) more$/, (m) => '再顯示 ' + m[1] + ' 個'],
+    [/^(\d+) views?$/, (m) => m[1] + ' 個檢視'],
+    /* 例行任務的執行時間：At 01:49 AM, Tuesday through Saturday */
+    [/^At (\d{1,2}:\d{2})\s*(AM|PM), (Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday) through (Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday)$/,
+      (m) => WEEKDAY_ZH[m[3]] + '至' + WEEKDAY_ZH[m[4]] + ' ' + clockZh(m[1], m[2])],
+    /* 側邊欄用量多了上下文那一段 */
+    [/^Usage: Context (\d+%?), Weekly · all models: (\d+)%, Resets (Sun|Mon|Tue|Wed|Thu|Fri|Sat) (\d{1,2}:\d{2})\s*(AM|PM)$/,
+      (m) => '用量：上下文 ' + m[1] + '，每週 · 所有模型：' + m[2] + '%，' + WEEKDAY_ZH[m[3]] + ' ' + clockZh(m[4], m[5]) + ' 重設'],
 
     /* 外掛卡片的分類列與作者（v3.23.0）。
        「Categories: Games, Designs & media, and Puzzles」每個分類都查得到才翻。 */
@@ -2027,6 +2176,9 @@
     // 版本號開頭的字串：v3.11.0 commit、v1.2 draft。那是使用者自己的紀錄不是介面文字。
     if (/^v\d+(\.\d+)+\b/.test(s)) return true;
 
+    // 外掛前綴的技能代號：anthropic-skills:docx。是識別碼不是介面文字（v3.25.0）
+    if (/^[a-z0-9-]+:[a-z0-9-]+$/.test(s)) return true;
+
     // 網址、email
     if (/:\/\//.test(s) || /^www\./i.test(s)) return true;
     if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s)) return true;
@@ -2252,7 +2404,8 @@
      父元素裡只能有這段文字，免得把譯文接在一整句話後面。 */
   function glossNode(node, parent) {
     const key = normalize(node.nodeValue);
-    const zh = GLOSS.get(key);
+    /* 外掛附帶的技能會帶前綴：anthropic-skills:docx。前綴是外掛名，查表時去掉（v3.25.0）。 */
+    const zh = GLOSS.get(key) || GLOSS.get(key.replace(/^[a-z0-9-]+:/, ''));
     if (!zh || !site.glossScope || !parent.closest(site.glossScope)) return false;
     if (normalize(parent.textContent) !== key) return false;
     if (parent.getAttribute('data-zh-gloss') !== zh) parent.setAttribute('data-zh-gloss', zh);
